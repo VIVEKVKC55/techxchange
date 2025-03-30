@@ -13,9 +13,21 @@ from .models import Product, Category
 from tinymce.widgets import TinyMCE
 
 class ProductForm(forms.ModelForm):
-    specification = forms.CharField(widget=TinyMCE())
-
-    description = forms.CharField(widget=TinyMCE())
+    specification = forms.CharField(
+        widget=TinyMCE(attrs={
+            'required': True,
+            'class': 'form-control tinymce-editor',
+            }),
+        required=True,
+    )
+    
+    description = forms.CharField(
+        widget=TinyMCE(attrs={
+            'required': True,
+            'class': 'form-control tinymce-editor',
+            }),
+        required=True,
+    )
 
     class Meta:
         model = Product

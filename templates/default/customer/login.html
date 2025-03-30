@@ -59,14 +59,14 @@
         </form>
 
         <!-- Social Login -->
-        <div class="text-center mt-4">
+        <!-- <div class="text-center mt-4">
             <p>- OR Continue with -</p>
             <div class="d-flex justify-content-center gap-3 social-icons">
                 <a href="#"><i class="fa fa-google"></i></a>
                 <a href="#"><i class="fa fa-apple"></i></a>
                 <a href="#"><i class="fa fa-facebook"></i></a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Sign Up -->
         <p class="text-center mt-3">Create An Account <a href="{% url "user:register" %}" class="text-danger fw-bold">Sign Up</a></p>
@@ -91,7 +91,7 @@
             // Show loader when submitting the form
             loginForm.addEventListener("submit", function () {
                 loginButton.disabled = true; // Disable button to prevent multiple clicks
-                // loader.style.display = "block";
+                loader.style.display = "block";
             });
         });
     </script>

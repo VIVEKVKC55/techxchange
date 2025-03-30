@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('TechXchange Admin Portal') }}{% endblock %}
+
+{% block extrahead %}
+    <link rel="icon" href="{% static 'img/core-img/favicon.ico' %}">
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'img/logo/logo.svg' %}" height="30px" style="vertical-align: middle; margin-right: 10px;">
+        <span style="color: white !important;">Administration</span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{% comment %} <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}"> {% endcomment %}
+{% endblock %}

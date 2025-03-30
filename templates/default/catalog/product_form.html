@@ -43,7 +43,7 @@
         <div class="container mt-4 mb-4">
             {% include 'default/customer/dashboard/page_header.html' with title="Add Product Page" %}
             <div class="card shadow-lg border-0 rounded-4 p-3">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="productForm">
                     {% csrf_token %}
                     <!-- Custom Image Upload Box -->
                     <div class="image-upload-box text-center mb-3">
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-danger w-100">Post/Publish</button>
+                    <button type="submit" class="btn btn-danger w-100" id="postButton">Post/Publish</button>
                 </form>
             </div>
         </div>
@@ -96,6 +96,18 @@
 {% endblock home_content %}
 {% block extrajs %}
 <!-- JavaScript for Multi-Image Upload with Max 5 Images -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const productForm = document.getElementById("productForm");
+        const postButton = document.getElementById("postButton");
+
+        // Show loader when submitting the form
+        productForm.addEventListener("submit", function () {
+            postButton.disabled = true; // Disable button to prevent multiple clicks
+            $(".loader-cont").show();
+        });
+    });
+</script>
 <script>
 document.getElementById("imageUpload").addEventListener("change", function (event) {
     let previewContainer = document.getElementById("imagePreview");

@@ -13,6 +13,8 @@ from django.utils.safestring import mark_safe
 
 User = get_user_model()
 
+admin.site.index_title = "TechXchange Dashboard"      # Dashboard subtitle
+
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ("user", "phone_number", "is_verified", "created_at")
