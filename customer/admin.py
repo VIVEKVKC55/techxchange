@@ -5,10 +5,11 @@ from django.core.mail import send_mail
 from django.utils.timezone import now
 from datetime import timedelta
 from django.utils.html import format_html
-from django.urls import path
+from django.urls import path, reverse
 from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, SubscriptionDuration
 from django.conf import settings
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from django.utils.safestring import mark_safe
 
 User = get_user_model()
 
@@ -103,8 +104,6 @@ admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 
 
-from django.utils.safestring import mark_safe
-
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = (
         "user", "approve_button", "amount_paid", "plan", "duration_days", "is_approved", 
@@ -185,15 +184,17 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     def approve_button(self, obj):
         if obj.pending_plan:
+            url = reverse('admin:approve_subscription', args=[obj.id])  # ✅ Ensure correct URL
             return mark_safe(
-                f'<button class="button approve-btn" data-id="{obj.id}" data-amount="{obj.amount_paid}">Approve</button>'
+                f'<button class="button approve-btn" data-url="{url}" data-id="{obj.id}" data-amount="{obj.amount_paid}" style="background: green; color: white; padding: 5px 10px; border-radius: 4px;">Approve</button>'
             )
         return "No pending request"
 
     def reject_button(self, obj):
         if obj.pending_plan:
+            url = reverse('admin:reject_subscription', args=[obj.id])  # ✅ Ensure correct URL
             return mark_safe(
-                f'<button class="button reject-btn" style="color: red;" data-id="{obj.id}">Reject</button>'
+                f'<button class="button reject-btn" data-url="{url}" data-id="{obj.id}" style="background: red; color: white; padding: 5px 10px; border-radius: 4px;">Reject</button>'
             )
         return "No pending request"
 

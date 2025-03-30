@@ -235,12 +235,96 @@
         }
     }
 
-    .goog-logo-link,
-    .goog-te-gadget-simple img {
+    /* Container styling */
+    #google_translate_element {
+        display: inline-block;
+        width: 180px;
+        /* Fixed width */
+    }
+
+    /* Hide default Google elements */
+    .goog-te-gadget {
+        font-size: 0 !important;
+    }
+
+    .goog-te-gadget-simple {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Style the visible button */
+    .VIpgJd-ZVi9od-xl07Ob-lTBxed {
+        display: inline-flex !important;
+        align-items: center;
+        width: 80% !important;
+        padding: 1px 3px !important;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .VIpgJd-ZVi9od-xl07Ob-lTBxed:hover {
+        background-color: #e9ecef;
+        border-color: #ccc;
+    }
+
+    /* Text styling */
+    .VIpgJd-ZVi9od-xl07Ob-lTBxed span {
+        color: #333 !important;
+        font-size: 14px !important;
+        display: inline-block;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    /* Dropdown arrow */
+    .VIpgJd-ZVi9od-xl07Ob-lTBxed span[aria-hidden="true"] {
+        color: #666 !important;
+        font-size: 12px !important;
+        margin-left: auto;
+        /* Push to right */
+        flex-shrink: 0;
+    }
+
+    /* Hide Google icon */
+    .goog-te-gadget-icon {
         display: none !important;
     }
 
-    .goog-te-gadget {
-        font-size: 0px;
-        /* Hide default text */
+    /* Dropdown panel styling */
+    .goog-te-menu2 {
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        width: auto !important;
+        min-width: 180px !important;
+    }
+
+    .goog-te-menu2-item {
+        padding: 8px 15px !important;
+        color: #333 !important;
+        white-space: nowrap;
+    }
+
+    .goog-te-menu2-item:hover {
+        background-color: #f8f9fa !important;
+    }
+
+    .goog-te-menu2-item-selected {
+        background-color: #e9ecef !important;
     }
