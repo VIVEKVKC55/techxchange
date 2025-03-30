@@ -14,9 +14,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import pymysql
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 pymysql.install_as_MySQLdb()
 from .logger import LOGGING
 
@@ -148,13 +145,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_URL = "/media/"
 # MEDIA_ROOT = BASE_DIR / "media"
 
-# cloudinary.config(
-#     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
-#     api_key=os.getenv('CLOUDINARY_API_KEY'),
-#     api_secret=os.getenv('CLOUDINARY_API_SECRET'),
-# )
-# # Set Cloudinary as the default file storage
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
