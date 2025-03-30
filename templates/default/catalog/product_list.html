@@ -1,0 +1,138 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} {{ query }}{{category}} Products List {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+{% block extrastyle %}
+<style>
+    .product-card {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        transition: 0.3s;
+        background: #fff;
+        transition: transform 0.2s ease-in-out;
+        font-size: 12px;
+    }
+
+    .product-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+
+    .wishlist-icon {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: white;
+        padding: 4px;
+        border-radius: 50%;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+    .product-card p {
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .custom-text-muted {
+        font-size: 9px;
+        /* Smaller location & time text */
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+</style>
+{% endblock extrastyle %}
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+
+{% block home_content %}
+    <!-- hero area -->
+    <header class="header-area bg-light">
+        <!-- Close Icon -->
+        <div class="nav-close">
+            <i class="fa fa-close" aria-hidden="true"></i>
+        </div>
+        <div>
+            Categories
+        </div>
+        <nav class="amado-nav">
+            <ul>
+                <li class="{% if not selected_category and not query %}active{% endif %}"><a href="{% url 'catalog:product_list' %}">
+                        All Categories
+                    </a>
+                </li>
+                {% for category in categories %}
+                <li class="{% if selected_category|slugify == category.slug|slugify %}active{% endif %}">
+                    <a href="{% url 'catalog:product_list' %}?category={{ category.slug }}">
+                        {{ category.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </header>
+    <div class="products-catagories-area clearfix">
+        <div class='container mt-4'>
+            <div class="card m-3 p-3 shadow-sm">
+                <!-- Banner -->
+                <div class="banner-container">
+                    <a href="#" target="_blank"> <!-- Replace with your actual URL -->
+                        <img src="{% static 'img/baneers/baneer-1.png' %}" alt="Festival Sale Banner">
+                    </a>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center m-3">
+                {% if query %}
+                    <span>Showing results for <strong>{{ query }}</strong> <span class="badge bg-success"></span></span>
+                {% elif category %}
+                    <span>Showing results for <strong>{{ category }}</strong> <span class="badge bg-success"></span></span>
+                {% endif %}
+                {% comment %} <div>
+                    <span class="">SORT BY</span>
+                    <select class="form-select d-inline-block w-auto">
+                        <option>Date Published</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                    </select>
+                </div> {% endcomment %}
+            </div>
+            <hr class='m-3 mb-4'>
+            <div class="row m-1">
+            <!-- Product Card -->
+            {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <a href="{% url 'catalog:product_detail' cat_slug=product.category.slug pk=product.pk %}" class="product-link text-decoration-none">
+                        <div class="product-card position-relative h-100">
+                            <img src="{{ product.default_image.image.url }}" class="img-fluid rounded" alt="Laptop">
+                            <span class="wishlist-icon position-absolute top-0 end-0 m-2">
+                                <i class="fa fa-heart"></i>
+                            </span>
+                            <p class="mt-2 text-dark">{{ product.name}}</p>
+                            <div class="d-flex justify-content-between custom-text-muted text-muted small mt-auto">
+                                <span class="text-start">{{ product.created_by.profile.location|capfirst }}</span>
+                                <span class="text-end">{{ product.created_at|timesince }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+            <p class="text-center">Results not found for {{category}}{{ query }}.</p>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock home_content %}

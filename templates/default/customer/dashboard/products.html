@@ -1,0 +1,125 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Products List {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+
+{% block home_content %}
+    <!-- hero area -->
+    {% include "default/customer/dashboard/left-menu.html" %}
+
+    <div class="products-catagories-area clearfix">
+        <div class="container mt-4 mb-4">
+            {% include 'default/customer/dashboard/page_header.html' with title="My Products" %}
+            <div class="card shadow-lg border-0 rounded-4 p-3">
+                <div class="table-responsive">
+                    <table id="post-list" class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                {% comment %} <th>Price</th> {% endcomment %}
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td><a href="{% url 'catalog:product_detail' cat_slug=product.category.slug pk=product.pk %}">{{ product.name|capfirst }}</a></td>
+                                <td>{{ product.category }}</td>
+                                <td>{{ product.brand }}</td>
+                                {% comment %} <td>${{ product.price }}</td> {% endcomment %}
+                                <td>{{ product.created_at|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    {% comment %} <a href="#" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-pencil-square"></i>
+                                    </a> {% endcomment %}
+                                    <button class="btn btn-danger delete-product" data-id="{{ product.id }}"><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- hero area end -->
+{% endblock home_content %}
+{% block extrastyle %}
+<link type="text/css" rel="stylesheet" href="{% static 'css/dataTables.bootstrap.css' %}" />
+{% endblock extrastyle %}
+
+{% block extrajs %}
+<script src="{% static 'js/dataTables.js' %}"></script>
+<script src="{% static 'js/dataTables.bootstrap.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof jQuery !== "undefined" && $.fn.dataTable) {
+            // Initialize DataTable only if jQuery and DataTables are available
+            new DataTable('#post-list', {
+                paging: true,
+                searching: true,
+                ordering: true
+            });
+        } else {
+            console.error("jQuery or DataTables is not loaded correctly.");
+        }
+    });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".delete-product").forEach(button => {
+        button.addEventListener("click", async function () {
+            const productId = this.getAttribute("data-id");
+            const row = this.closest("tr"); // Find the table row (or closest parent container)
+
+            const confirmation = await Swal.fire({
+                title: "Are you sure?",
+                text: "You won’t be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            });
+
+            if (confirmation.isConfirmed) {
+                try {
+                    const response = await fetch(`/product/delete-product/${productId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        await Swal.fire("Deleted!", "Product has been deleted.", "success");
+
+                        // ✅ Remove the row from the DOM instead of reloading the page
+                        if (row) {
+                            row.remove();
+                        }
+                    } else {
+                        Swal.fire("Error!", data.error || "Something went wrong.", "error");
+                    }
+                } catch (error) {
+                    Swal.fire("Error!", "Server error occurred.", "error");
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock extrajs %}

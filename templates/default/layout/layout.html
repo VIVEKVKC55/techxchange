@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{% endblock %}Techxchange</title>
+
+        {% include "default/layout/head.html" %}
+
+        {% block extrastyle %}
+        {% endblock extrastyle %}
+
+        {% block ld_json %}
+        {% endblock ld_json %}
+
+        {{analytics.head|safe}}
+    </head>
+    <!-- END HEAD -->
+
+    <body>
+        {{analytics.body|safe}}
+
+        <div class="">
+            {% include "default/layout/top_menu.html" %}
+
+            {% block breadcrumb %}{% endblock breadcrumb %}
+
+            <div class="main-content-wrapper d-flex clearfix">
+
+                {% include "default/layout/mobile_nav.html" %}
+
+                {% comment %} {% include "default/layout/header.html" %} {% endcomment %}
+
+            
+                {% block home_content %}
+                {% endblock home_content %}
+
+            </div>
+
+            {% block content %}{% endblock content %}
+
+            {% include "default/layout/footer.html" %}
+        </div>
+
+        <div class="loader-cont">
+            <div class='loading' style='transform:scale(0.79);'>
+                <img src="{% static 'loader.gif' %}" alt="Loading...">
+            </div>
+        </div>
+
+        {% if messages %}
+            <div id="messagePopup" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050;">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% include "default/layout/javascript.html" %}
+
+        {% block extrajs %}
+        {% endblock extrajs %}
+    </body>
+</html>

@@ -1,0 +1,82 @@
+{% load static %}
+
+<!-- ##### jQuery (Necessary for All JavaScript Plugins) ##### -->
+<script src="{% static 'js/jquery/jquery-2.2.4.min.js' %}"></script>
+<!-- Popper js -->
+<script src="{% static 'js/popper.min.js' %}"></script>
+<!-- Bootstrap js -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- Plugins js -->
+<script src="{% static 'js/plugins.js' %}?v=1.0"></script>
+<!-- Active js -->
+<script src="{% static 'js/active.js' %}"></script>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',  // Default language
+            includedLanguages: 'en,ar', // Allowed languages
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const messagePopup = document.getElementById("messagePopup");
+
+        // Auto-hide the alert after 3 seconds
+        if (messagePopup) {
+            setTimeout(function () {
+                messagePopup.style.display = "none";
+            }, 6000);
+        }
+    });
+    $(document).ready(function () {
+        $(".product-card").on("click", function (e) {
+            e.preventDefault();
+            let productUrl = $(this).closest("a").attr("href");
+    
+            $.ajax({
+                url: productUrl,
+                type: "GET",
+                dataType: "json",
+                headers: { "X-Requested-With": "XMLHttpRequest" }, // Mark request as AJAX
+                success: function (response) {
+                    if (response.redirect_url) {
+                        window.location.href = response.redirect_url; // Redirect if allowed
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 403) {
+                        let errorMsg = xhr.responseJSON?.error || "You have reached your daily limit.";
+                        showErrorAlert(errorMsg); // Show SweetAlert2 pop-up
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "An error occurred while processing your request.",
+                        });
+                    }
+                },
+            });
+        });
+    
+        // Function to display a SweetAlert2 pop-up
+        function showErrorAlert(message) {
+            Swal.fire({
+                icon: "warning",
+                title: "Access Denied",
+                text: message,
+                confirmButtonColor: "#d33",
+                confirmButtonText: "OK",
+            });
+        }
+    });
+    
+</script>
+<!-- SweetAlert2 CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<!-- ##### All Javascript Files ##### -->

@@ -1,0 +1,246 @@
+    /* ####################################################
+    :: Template Name: Essence - Fashion Ecommerce Template
+    :: Author: Colorlib
+    :: Author URL: https://colorlib.com
+    :: Description: Essence is smart & elegant fashion e-commerce Template. It's suitable for all e-commerce business platform.
+    :: Version: 1.0.0
+    :: Created: April 27, 2018
+    :: Last Updated: May 2, 2018
+    #################################################### */
+
+    /* ---------------------------------------
+    ##### - PLACE YOUR CUSTOM CSS HERE - #####
+    --------------------------------------- */
+
+    .custom-card {
+        max-width: 500px;
+        width: 96%;
+        margin: auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        padding: 30px;
+    }
+
+    .social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 1px solid #e63946;
+        font-size: 20px;
+        color: black;
+    }
+
+    .social-icons a:hover {
+        background-color: #e63946;
+        color: white;
+    }
+
+    .loader-cont {
+        display: none;
+        z-index: 999;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+    }
+
+    .loader-cont .loading {
+        margin: auto;
+        top: 20%;
+        left: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        position: absolute;
+    }
+
+    /* Banner Styling */
+    .banner-container {
+        width: 100%;
+        max-height: 275px;
+        /* Fixed height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    /* Dropdown Item Hover */
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Custom dropdown button spacing */
+    .custom-dropdown {
+        min-width: 180px;
+    }
+
+    .search-bar {
+        background: #f0f1f3;
+        border: 1px solid #dc3545;
+        border-radius: 3px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 20px;
+        margin-right: 20px;
+        height: 50px;
+        width: 100%;
+    }
+
+    .search-bar input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+    }
+
+    /* Show only on mobile */
+    @media (min-width: 768px) {
+        .mobile-search {
+            display: none;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .desktop-nav {
+            display: none !important;
+        }
+    }
+
+    .banner-card {
+        height: 250px;
+        /* Ensuring all banners have the same height */
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .banner-img {
+        height: 100%;
+        /* Ensuring images cover the whole card */
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .category-card h4 {
+        font-size: 15px
+    }
+
+    .overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .banner-card:hover .overlay {
+        background: rgba(237, 90, 90, 0.6);
+    }
+
+    .overlay a,
+    .overlay p {
+        color: #242424;
+        transition: all 0.3s ease;
+    }
+
+    .banner-card:hover .overlay a,
+    .banner-card:hover .overlay p {
+        color: white;
+    }
+
+    /* CSS for Mobile Footer */
+    .mobile-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .footer-menu {
+        display: flex;
+        justify-content: space-between;
+        /* Ensures even spacing */
+        align-items: center;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    .footer-menu li {
+        flex: 1;
+        /* Equal width for all items */
+        text-align: center;
+    }
+
+    .footer-menu li a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #333;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 5px 0;
+        width: 100%;
+    }
+
+    .footer-menu li a i {
+        font-size: 20px;
+        margin-bottom: 4px;
+        transition: all 0.3s ease;
+    }
+
+    /* Fix the extra space issue by ensuring proper alignment */
+    .footer-nav {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Hover & Active Effects */
+    .footer-menu li a:hover,
+    .footer-menu li a.active {
+        color: #dc3545;
+        transform: scale(1.1);
+    }
+
+    .footer-menu li a:hover i,
+    .footer-menu li a.active i {
+        color: #dc3545;
+    }
+
+    @media (min-width: 768px) {
+        .mobile-footer {
+            display: none !important;
+        }
+    }
+
+    .goog-logo-link,
+    .goog-te-gadget-simple img {
+        display: none !important;
+    }
+
+    .goog-te-gadget {
+        font-size: 0px;
+        /* Hide default text */
+    }

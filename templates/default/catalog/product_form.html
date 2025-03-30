@@ -1,0 +1,185 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Account Dashboard {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+{% block extrastyle %}
+<style>
+    .image-upload {
+        height: 150px;
+        border: 2px dashed #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .image-upload-box {
+        width: 100%;
+        height: 150px;
+        border: 2px dashed #d3d3d3;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 10px auto;
+        cursor: pointer;
+    }
+    .image-upload-box:hover {
+        border-color: #ff4d4d;
+        color: #ff4d4d;
+    }
+</style>
+{% endblock extrastyle %}
+{% block home_content %}
+
+    <!-- hero area -->
+    {% include "default/customer/dashboard/left-menu.html" %}
+
+    <div class="products-catagories-area clearfix">
+        <div class="container mt-4 mb-4">
+            {% include 'default/customer/dashboard/page_header.html' with title="Add Product Page" %}
+            <div class="card shadow-lg border-0 rounded-4 p-3">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- Custom Image Upload Box -->
+                    <div class="image-upload-box text-center mb-3">
+                        <div class="d-flex align-items-center gap-2 flex-wrap" id="uploadContainer">
+                            <!-- Upload button -->
+                            <label for="imageUpload" class="upload-area d-flex align-items-center justify-content-center border rounded p-2" id="uploadLabel" style="width: 100px; height: 100px; cursor: pointer;">
+                                <i class="fa fa-camera fa-2x"></i>
+                            </label>
+                    
+                            <!-- Image preview section -->
+                            <div id="imagePreview" class="d-flex flex-wrap gap-2"></div>
+                        </div>
+                    
+                        <input type="file" id="imageUpload" name="images" accept="image/*" multiple hidden>
+                        <p id="errorMsg" class="text-danger mt-2" style="display: none;">You can only upload up to 5 images.</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                {{ form.category }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Specification</label>
+                                {{ form.specification }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Brand</label>
+                                {{ form.brand }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Product Description</label>
+                                {{ form.description }}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-danger w-100">Post/Publish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- hero area end -->
+{% endblock home_content %}
+{% block extrajs %}
+<!-- JavaScript for Multi-Image Upload with Max 5 Images -->
+<script>
+document.getElementById("imageUpload").addEventListener("change", function (event) {
+    let previewContainer = document.getElementById("imagePreview");
+    let uploadLabel = document.getElementById("uploadLabel");
+    let errorMsg = document.getElementById("errorMsg");
+
+    let currentImages = previewContainer.children.length;
+    let newFiles = Array.from(event.target.files);
+
+    if (currentImages + newFiles.length > 5) {
+        errorMsg.style.display = "block"; // Show error if exceeding limit
+        return;
+    } else {
+        errorMsg.style.display = "none"; // Hide error if within limit
+    }
+
+    newFiles.forEach((file) => {
+        if (file.type.startsWith("image/")) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let div = document.createElement("div");
+                div.classList.add("position-relative", "m-2");
+                div.style.width = "100px";
+                div.style.height = "100px";
+
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="rounded border shadow-sm w-100 h-100 object-fit-cover">
+                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 remove-image">
+                        &times;
+                    </button>
+                `;
+                previewContainer.appendChild(div);
+
+                // Attach event listener directly to remove button
+                div.querySelector(".remove-image").addEventListener("click", function (e) {
+                    e.stopPropagation(); // Stop bubbling
+                    div.remove(); // Remove image preview
+
+                    // Show label if images are less than 5
+                    if (document.getElementById("imagePreview").children.length < 5) {
+                        document.getElementById("uploadLabel").style.display = "block";
+                    }
+                });
+
+                // Hide label if 5 images are reached
+                if (previewContainer.children.length >= 5) {
+                    uploadLabel.style.display = "none";
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+// Clicking only on the preview area (not the remove button) opens the file input
+document.getElementById("imagePreview").addEventListener("click", function (e) {
+    if (!e.target.classList.contains("remove-image")) {
+        document.getElementById("imageUpload").click();
+    }
+});
+
+</script>
+<!-- Place the first <script> tag in your HTML's <head> -->
+{% comment %} <script src="https://cdn.tiny.cloud/1/6kf8tgsyvmi7dwwz3brx0u85ofxk6j853gapbf479qjlx2h2/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script> {% endcomment %}
+
+<!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+<script>
+tinymce.init({
+    selector: 'textarea',
+    plugins: [
+    // Core editing features
+    'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+    // Your account includes a free trial of TinyMCE premium features
+    // Try the most popular premium features until Mar 19, 2025:
+    'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+    ],
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+    { value: 'First.Name', title: 'First Name' },
+    { value: 'Email', title: 'Email' },
+    ],
+    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+});
+</script>
+{% endblock extrajs %}

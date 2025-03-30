@@ -1,0 +1,66 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} User Profile {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+{% block extrastyle %}
+<style>
+
+</style>
+{% endblock %}
+{% block home_content %}
+    <!-- hero area -->
+    {% include "default/customer/dashboard/left-menu.html" %}
+    <div class="products-catagories-area clearfix">
+        <div class="container mb-4 mt-4">
+            {% include 'default/customer/dashboard/page_header.html' with title="Users Who Viewed My Products" %}
+            <div class="card shadow-lg border-0 rounded-4 p-3">
+                {% if user_product_views %}
+                    {% for product, users in user_product_views.items %}
+                        <div class="mb-4">
+                            <h5 class="text-info">{{ product.name }}</h5>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>User Name</th>
+                                        <th>Email</th>
+                                        <th>Viewed At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% for view in product.user_views.all %}
+                                                {% if view.user == user %}
+                                                    {{ view.viewed_at|date:"Y-m-d H:i:s" }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        No users have viewed your products yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- hero area end -->
+{% endblock home_content %}
+{% block extrajs %}
+
+{% endblock extrajs %}

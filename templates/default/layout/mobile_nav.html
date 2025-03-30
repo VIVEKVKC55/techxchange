@@ -1,0 +1,42 @@
+{% load static %}
+<!-- Mobile Nav (max width 767px)-->
+<div class="mobile-nav">
+    <!-- Navbar Brand -->
+    <div class="amado-navbar-toggler">
+        <span></span><span></span><span></span>
+    </div>
+    <div class="amado-navbar-brand" style="align-items: center;">
+        <a class="" href="{% url 'home:home' %}">
+            <img src="{% static 'img/logo/image.png' %}" class="" alt="TechXchange Logo">
+        </a>
+    </div>
+    <!-- Navbar Toggler -->
+	<div id="google_translate_element"></div>
+
+    <!-- My Account Dropdown -->
+    <div class="dropdown">
+        <a class="text-dark text-decoration-none dropdown-toggle" href="#" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-user"></i> My Account
+        </a>
+        <ul class="dropdown-menu custom-dropdown">
+            {% if user.is_authenticated %}
+            <li><a class="dropdown-item" href="{% url 'user:profile' %}"><i class="fa fa-user-circle me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'user:logout' %}"><i class="fa fa-sign-out me-2"></i>Logout</a></li>
+            {% else %}
+            <li><a class="dropdown-item" href="{% url 'user:register' %}"><i class="fa fa-user-plus me-2"></i>Registration</a></li>
+            <li><a class="dropdown-item" href="{% url 'user:login' %}"><i class="fa fa-sign-in me-2"></i>Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<!-- Mobile Search Bar -->
+<div class="search-bar mobile-search m-3">
+    <form action="{% url 'catalog:product_list' %}" method="GET" class="search-bar mx-3 d-flex align-items-center">
+        <i class="fa fa-search text-muted"></i>
+        <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Search product..." value="{{ query }}">
+        <button type="submit" class="btn p-0">
+            <i class="fa fa-microphone text-muted"></i>
+        </button>
+    </form>
+</div>

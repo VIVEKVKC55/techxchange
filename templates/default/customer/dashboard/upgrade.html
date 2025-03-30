@@ -1,0 +1,181 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Upgrade Subscription {% endblock %}
+{% block canonical_url %}{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}{% endblock %}
+
+{% block home_content %}
+    <!-- Sidebar -->
+    {% include "default/customer/dashboard/left-menu.html" %}
+
+    <div class="products-catagories-area clearfix">
+        <div class="container mt-4 mb-4">
+            {% include 'default/customer/dashboard/page_header.html' with title="Subscription" %}
+
+            <div class="card shadow-lg border-0 rounded-4 p-4">
+                
+                <!-- ✅ Current Subscription Section -->
+                <div class="p-3 bg-light rounded">
+                    <h5>Current Subscription</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Plan:</strong> {{ subscription.plan.name }}</li>
+                        <li class="list-group-item"><strong>Status:</strong> 
+                            {% if subscription.is_approved %} ✅ Active {% else %} ⏳ Pending Approval {% endif %}
+                        </li>
+                        <li class="list-group-item"><strong>Start Date:</strong> {{ subscription.start_date }}</li>
+                        <li class="list-group-item"><strong>End Date:</strong> 
+                            {% if subscription.end_date %} {{ subscription.end_date }} {% else %} Unlimited {% endif %}
+                        </li>
+                        <li class="list-group-item"><strong>Extra Slots:</strong> {{ subscription.extra_slots }}</li>
+                    </ul>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- ✅ Upgrade Subscription Section -->
+                <div class="p-3 bg-light rounded">
+                    <h5>Upgrade Your Subscription</h5>
+                    <form method="post" id="upgradeForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <!-- Plan Selection -->
+                            <div class="col-md-6">
+                                <label for="planSelect" class="form-label">Select Plan</label>
+                                <select id="planSelect" name="plan" class="form-select" required>
+                                    <option value="">-- Select Plan --</option>
+                                    {% for plan in plans %}
+                                        <option value="{{ plan.id }}">{{ plan.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Duration Selection -->
+                            <div class="col-md-6">
+                                <label for="durationSelect" class="form-label">Select Duration</label>
+                                <select id="durationSelect" name="duration" class="form-select" required>
+                                    <option value="">-- Select Duration --</option>
+                                    {% for duration in durations %}
+                                        <option value="{{ duration.id }}">{{ duration.duration_days }} Days</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Price Display -->
+                        <div class="mt-3">
+                            <h5>Total Price: <span id="priceDisplay" class="text-danger fw-bold">0 AED</span></h5>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger mt-3">Upgrade Plan</button>
+                    </form>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- ✅ Subscription Pricing Table -->
+                <div class="p-3 bg-light rounded">
+                    <h5>Subscription Pricing</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Plan</th>
+                                    {% for duration in durations %}
+                                        <th>{{ duration.duration_days }} Days</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for plan, durations in plan_prices.items %}
+                                    <tr>
+                                        <td><strong>{{ plan }}</strong></td>
+                                        {% for duration_days, price in durations.items %}
+                                            <td>{{ price|default:"-" }} AED</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="p-3 bg-light rounded">
+                <h5>Paid Subscription Plans</h5>
+                    <div class="row justify-content-center">
+                        <!-- Plan A -->
+                        <div class="col-md-6 d-flex mb-3">
+                            <div class="card shadow-sm border-primary w-100 h-100 d-flex flex-column">
+                                <div class="card-header bg-primary text-white text-center fw-bold">
+                                    Plan A – Standard Paid Subscription
+                                </div>
+                                <div class="card-body flex-grow-1">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">📦 Product Uploads: Can upload up to <strong>{{ premium_plans.max_products_per_day }} products</strong> at a time.</li>
+                                        <li class="list-group-item">🔍 Unlimited product searches & details access.</li>
+                                        <li class="list-group-item">🚀 Priority listing in search results (higher visibility).</li>
+                                        <li class="list-group-item">📊 Basic analytics (number of views & inquiries).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Plan B -->
+                        <div class="col-md-6 d-flex">
+                            <div class="card shadow-sm border-success w-100 h-100 d-flex flex-column">
+                                <div class="card-header bg-success text-white text-center fw-bold">
+                                    Plan B – Scalable Paid Subscription
+                                </div>
+                                <div class="card-body flex-grow-1">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">✅ Includes all features of Plan A.</li>
+                                        <li class="list-group-item">➕ Users can buy additional product slots beyond the initial 10.</li>
+                                        <li class="list-group-item">💰 Extra charge per additional slot (flexible pricing model).</li>
+                                        <li class="list-group-item">📢 Broadcast feature (send bulk notifications about new stock).</li>
+                                        <li class="list-group-item">📈 Advanced analytics (who viewed your products, demand trends, etc.).</li>
+                                        <li class="list-group-item">🎧 Dedicated customer support for faster issue resolution.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+{% endblock home_content %}
+
+{% block extrajs %}
+<script>
+    $(document).ready(function () {
+        $("#planSelect, #durationSelect").change(function () {
+            var planId = $("#planSelect").val();
+            var durationId = $("#durationSelect").val();
+    
+            if (planId && durationId) {
+                $(".loader-cont").show(); // ✅ Show loader
+    
+                $.ajax({
+                    url: "{% url 'user:get-plan-price' %}", // ✅ Correct URL
+                    type: "GET",
+                    data: { plan_id: planId, duration_id: durationId },
+                    success: function (response) {
+                        if (response.price) {
+                            $("#priceDisplay").text(response.price + " AED");
+                        } else {
+                            $("#priceDisplay").text("Not Available");
+                        }
+                    },
+                    error: function () {
+                        $("#priceDisplay").text("Error fetching price");
+                    },
+                    complete: function () {
+                        $(".loader-cont").hide(); // ✅ Hide loader after request completes
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock extrajs %}

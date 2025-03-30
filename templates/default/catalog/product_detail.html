@@ -1,0 +1,175 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} {{ product.name }} {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+{% block extrastyle %}
+<style>
+	/* Dropdown Item Hover */
+	.dropdown-item:hover {
+		background-color: #f8f9fa;
+	}
+
+	/* Custom dropdown button spacing */
+	.custom-dropdown {
+		min-width: 180px;
+	}
+
+	.search-bar {
+		background: #f0f1f3;
+		border: 1px solid #dc3545;
+		border-radius: 3px;
+		padding: 8px 15px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-left: 20px;
+		margin-right: 20px;
+		height: 50px;
+		width: 100%;
+	}
+
+	.search-bar input {
+		border: none;
+		background: transparent;
+		outline: none;
+		width: 100%;
+	}
+
+	/* Show only on mobile */
+	@media (min-width: 768px) {
+		.mobile-search {
+			display: none;
+		}
+	}
+
+	@media (max-width: 767px) {
+		.desktop-nav {
+			display: none !important;
+		}
+	}
+
+	.carousel-inner img {
+		height: 450px;
+		/* Adjust as needed */
+		object-fit: cover;
+	}
+
+	.custom-text-muted {
+		font-size: 9px;
+		/* Smaller location & time text */
+	}
+</style>
+{% endblock %}
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+
+{% block content %}
+<!-- hero area -->
+<div class="container mt-1">
+	<div class="card p-3 shadow-sm">
+		<!-- Banner -->
+		<div class="banner-container">
+			<a href="#" target="_blank"> <!-- Replace with your actual URL -->
+				<img src="{% static 'img/baneers/baneer-1.png' %}" alt="Festival Sale Banner">
+			</a>
+		</div>
+	</div>
+</div>
+<div class="container mt-4">
+	<div class="row">
+		<!-- Left Side: Image Gallery -->
+		<div class="col-md-8">
+			<div id="productCarousel" class="card p-3 shadow-sm carousel slide" data-bs-ride="carousel">
+				<!-- Main Image Display -->
+				<div class="carousel-inner">
+					{% for image in product.images %}
+					<div class="carousel-item {% if forloop.first %}active{% endif %}">
+						<img src="{{ image.image.url }}" class="d-block w-100 rounded" alt="{{ product.name }}-{{ forloop.counter }}">
+					</div>
+					{% endfor %}
+				</div>
+				<a class="carousel-control-prev" href="#productCarousel" role="button" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				</a>
+				<a class="carousel-control-next" href="#productCarousel" role="button" data-bs-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				</a>
+			
+				<hr>
+			
+				<!-- Thumbnail Navigation -->
+				<div class="d-flex justify-content-center mt-3">
+					{% for image in product.images %}
+					<button type="button" data-bs-target="#productCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="mx-1 border-0 {% if forloop.first %}active{% endif %}">
+						<img src="{{ image.image.url }}" class="img-thumbnail" width="60" height="45" alt="{{ product.name }}-{{ forloop.counter }}">
+					</button>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="card p-3 mb-2 shadow-sm">
+				<h5>Description</h5>
+				<p><strong>{{ product.name}}</strong></p>
+				<p>{{ product.specification|safe }}</p>
+				<p>{{ product.description|safe }}</p>
+
+			</div>
+
+		</div>
+
+		<!-- Right Side: Product Details -->
+		<div class="col-md-4">
+			<div class="card p-3 shadow-sm">
+				<!-- <h2 class="price">₹ 4,999</h2> -->
+				<p class="text-muted">{{ product.name}}</p>
+				<div class="d-flex justify-content-between custom-text-muted text-muted small mt-auto">
+					<span class="text-start">{{ product.created_by.profile.location }}</span>
+					<span class="text-end">{{ product.created_at|timesince }}</span>
+				</div>
+			</div>
+			<div class="card p-3 mt-2 shadow-sm">
+				<div class="d-flex align-items-center">
+					<img src="/static/img/logo/seller-logo.png" alt="Seller Logo" class="rounded-circle me-3" width="50"
+						height="50">
+					<h5 class="mb-0">{{ product.created_by }}</h5>
+				</div>
+
+				<button class="btn btn-outline-dark w-100 mt-3">Chat with seller</button>
+
+				<div class="p-3 text-center d-flex align-items-center justify-content-center">
+					<div class="d-flex align-items-center justify-content-center">
+						<i class="fa fa-phone-alt me-2"></i>
+						<span id="hidden-number">** **** ****</span>
+						<a href="#" id="show-number-btn" class="ms-2 text-primary text-decoration-none fw-bold">Show
+							number</a>
+					</div>
+				</div>
+
+				<script>
+					document.getElementById("show-number-btn").addEventListener("click", function (event) {
+						event.preventDefault(); // Prevent page refresh
+						document.getElementById("hidden-number").textContent = "{{ product.created_by.profile.phone_number }}"; // Replace with actual number
+						this.style.display = "none"; // Hide the "Show number" button
+					});
+				</script>
+
+			</div>
+
+			<!-- Location Section -->
+			<div class="card mt-2 p-2 shadow-sm">
+				<h6 class="mb-0 text-muted">Posted in</h6>
+				<p class="mb-0 fw-bold">{{ product.created_by.profile.location }}</p>
+			</div>
+			<div class="card p-3 mt-2 shadow-sm">
+				<iframe id="mapFrame"
+					src="https://maps.google.com/maps?q={{ product.created_by.profile.location }}&t=&z=13&ie=UTF8&iwloc=&output=embed"
+					width="100%" height="200" style="border:0;" allowfullscreen></iframe>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+{% block extrajs %}
+
+{% endblock extrajs %}

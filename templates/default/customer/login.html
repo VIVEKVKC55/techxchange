@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Page</title>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{% static 'css/core-style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body class="d-flex align-items-center vh-100 bg-light">
+
+    <div class="card custom-card">
+        <!-- Welcome Text -->
+        <h2 class="fw-bold text-center">Welcome Back!</h2>
+        {% if messages %}
+            <div id="messagePopup" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050;">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" class="mt-4" id="loginForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-user"></i></span>
+                    <input type="text" class="form-control" name="username" required placeholder="Username or Email">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-lock"></i></span>
+                    <input type="password" class="form-control" name="password" required id="passwordInput" placeholder="Password">
+                    <span class="input-group-text bg-white">
+                        <i class="fa fa-eye toggle-password" id="togglePassword" style="cursor: pointer;"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <a href="{% url 'user:forgot_password' %}" class="text-danger text-decoration-none">Forgot Password?</a>
+            </div>
+        
+            <!-- Loader (Initially Hidden) -->
+            <div id="loader" class="loader-cont text-center" style="display: none;">
+                <div class='loading' style='transform:scale(0.79);'>
+                    <img src="{% static 'loader.gif' %}" alt="Loading...">
+                </div>
+            </div>
+        
+            <button type="submit" class="btn btn-danger w-100 mt-3" id="loginButton">Login</button>
+        </form>
+
+        <!-- Social Login -->
+        <div class="text-center mt-4">
+            <p>- OR Continue with -</p>
+            <div class="d-flex justify-content-center gap-3 social-icons">
+                <a href="#"><i class="fa fa-google"></i></a>
+                <a href="#"><i class="fa fa-apple"></i></a>
+                <a href="#"><i class="fa fa-facebook"></i></a>
+            </div>
+        </div>
+
+        <!-- Sign Up -->
+        <p class="text-center mt-3">Create An Account <a href="{% url "user:register" %}" class="text-danger fw-bold">Sign Up</a></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const togglePassword = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("passwordInput");
+            const loginForm = document.getElementById("loginForm");
+            const loginButton = document.getElementById("loginButton");
+            const loader = document.getElementById("loader");
+    
+            // Toggle password visibility
+            togglePassword.addEventListener("click", function () {
+                const type = passwordInput.type === "password" ? "text" : "password";
+                passwordInput.type = type;
+                this.classList.toggle("fa-eye");
+                this.classList.toggle("fa-eye-slash");
+            });
+    
+            // Show loader when submitting the form
+            loginForm.addEventListener("submit", function () {
+                loginButton.disabled = true; // Disable button to prevent multiple clicks
+                // loader.style.display = "block";
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messagePopup = document.getElementById("messagePopup");
+    
+            // Auto-hide the alert after 3 seconds
+            if (messagePopup) {
+                setTimeout(function () {
+                    messagePopup.style.display = "none";
+                }, 2000);
+            }
+        });
+    </script>
+    <!-- JavaScript Files -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+
+</html>

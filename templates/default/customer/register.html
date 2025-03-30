@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="{% static 'css/core-style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body class="d-flex align-items-center vh-100 bg-light">
+
+    <div class="card custom-card">
+        <!-- Welcome Text -->
+        <h2 class="fw-bold text-center">Create an Account</h2>
+        {% if messages %}
+            <div id="messagePopup" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050;">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-user"></i></span>
+                    <input type="text" class="form-control" name="name" required placeholder="Full Name">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
+                    <input type="text" name="phone_number" class="form-control" placeholder="Mobile Number">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Location</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
+                    <input type="text" name="location" class="form-control" placeholder="Location">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email ID</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-envelope"></i></span>
+                    <input type="email" class="form-control" name="email" required placeholder="Email ID">
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="btn btn-danger w-100 mt-3">Create Account</button>
+        </form>
+
+        <!-- Social Login -->
+        <div class="text-center mt-4">
+            <p>- OR Continue with -</p>
+            <div class="d-flex justify-content-center gap-3 social-icons">
+                <a href="#"><i class="fa fa-google"></i></a>
+                <a href="#"><i class="fa fa-apple"></i></a>
+                <a href="#"><i class="fa fa-facebook"></i></a>
+            </div>
+        </div>
+
+        <!-- Login Link -->
+        <p class="text-center mt-3">Already have an account? <a href="{% url "user:login" %}" class="text-danger fw-bold">Login</a>
+        </p>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messagePopup = document.getElementById("messagePopup");
+    
+            // Auto-hide the alert after 3 seconds
+            if (messagePopup) {
+                setTimeout(function () {
+                    messagePopup.style.display = "none";
+                }, 2000);
+            }
+        });
+    </script>
+    <!-- Bootstrap js -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+
+
+</html>

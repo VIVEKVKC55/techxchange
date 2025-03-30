@@ -1,0 +1,86 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} Techxchaung Home Page {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+
+{% block home_content %}
+    <!-- hero area -->
+    <!-- Header Area Start -->
+    <header class="header-area bg-light">
+        <!-- Close Icon -->
+        <div class="nav-close">
+            <i class="fa fa-close" aria-hidden="true"></i>
+        </div>
+        <!-- Logo -->
+        <!-- <div class="logo">
+            <a href="index.html"><img src="img/core-img/logo.png" alt=""></a>
+        </div> -->
+        <!-- Amado Nav -->
+        <nav class="amado-nav">
+            <ul>
+                <li class="active"><a href="{% url "home:home" %}">Home</a></li>
+                <li><a href="{% url "catalog:product_list" %}">All Products</a></li>
+                <li><a href="{% url "catalog:product_create" %}">Add Product</a></li>
+            </ul>
+        </nav>
+        <!-- Button Group -->
+        <div class="amado-btn-group mt-30 mb-100">
+            <a href="#" class="btn amado-btn mb-15">%Discount%</a>
+            <a href="#" class="btn amado-btn active">New this week</a>
+        </div>
+        <!-- Cart Menu -->
+        <div class="cart-fav-search mb-100">
+            <a href="#" class="fav-nav"><img src="{% static 'img/core-img/favorites.png' %}" alt=""> Favourite</a>
+            <a href="#top" class=""><img src="{% static 'img/core-img/search.png' %}" alt=""> Search</a>
+        </div>
+
+    </header>
+    <!-- Header Area End -->
+
+    <!-- Product Catagories Area Start -->
+    <div class="products-catagories-area clearfix">
+
+        <!-- Categories Section -->
+        <div class="m-4 amado-pro-catagory clearfix">
+            {% for catagory in categories %}
+            <div class="single-products-catagory category-card clearfix">
+                <a href="{% url 'catalog:product_list' %}?category={{ catagory.slug }}">
+                    <img src="{{catagory.image_url.url}}" alt="{{ catagory.name }}">
+                    <!-- Hover Content -->
+                    <div class="hover-content">
+                        <h4>{{ catagory.name }}</h4>
+                        <div class="line"></div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Product Catagories Area End -->
+    </div>
+
+    <!-- ##### Promotion Area Start ##### -->
+    <div class="container mb-4 mt-4">
+        <h5 class="fw-bold text-center mb-4">Promotion Banners</h5>
+        <div class="row g-3">
+            {% for banner in promotion_banners %}
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-sm banner-card position-relative">
+                    <a href="{{ banner.link }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm banner-card position-relative">
+                            <img src="{{banner.image.url}}" class="card-img-top banner-img"
+                                alt="{{ banner.title }}">
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- ##### Promotion Area End ##### -->
+    <!-- hero area end -->
+{% endblock home_content %}

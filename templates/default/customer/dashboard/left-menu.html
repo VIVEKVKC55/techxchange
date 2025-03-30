@@ -1,0 +1,49 @@
+    
+{% load static %}
+<!-- Header Area Start -->
+<header class="header-area bg-light">
+    <!-- Close Icon -->
+    <div class="nav-close">
+        <i class="fa fa-close" aria-hidden="true"></i>
+    </div>
+    <div>
+        Dashboard
+    </div>
+    <nav class="amado-nav">
+        <ul>
+            <ul class="nav">
+                <li class="{% if page == 'profile' %}active{% endif %}">
+                    <a href="{% url "user:profile" %}">Profile</a>
+                </li>
+                <li class="{% if request.path == '/accounts/user-products/' %}active{% endif %}">
+                    <a href="{% url 'user:user-products' %}">My Products</a>
+                </li>
+                <li class="{% if request.path == '/product/create/' %}active{% endif %}">
+                    <a href="{% url 'catalog:product_create' %}">Add Product</a>
+                </li>
+                {% comment %} <li class="{% if request.path == '/catalog/products/change/' %}active{% endif %}">
+                    <a href="#">Change Products</a>
+                </li>
+                <li class="{% if request.path == '/catalog/products/delete/' %}active{% endif %}">
+                    <a href="#">Delete Products</a>
+                </li> {% endcomment %}
+                <li class="{% if request.path == '/accounts/change-password/' %}active{% endif %}">
+                    <a href="{% url "user:change-password" %}">Change Password</a>
+                </li>
+                <li class="{% if request.path == '/accounts/my-viewed-products/' %}active{% endif %}">
+                    <a href="{% url "user:my-viewed-products" %}">My Viewed</a>
+                </li>
+                <li class="{% if request.path == '/accounts/users-who-viewed-my-products/' %}active{% endif %}">
+                    <a href="{% url "user:users-who-viewed-my-products" %}">All User Viewed</a>
+                </li>
+                <li class="{% if request.path == '/accounts/plan-upgrade/' %}active{% endif %}">
+                    <a href="{% url "user:subscription_upgrade" %}">Plan Upgrade</a>
+                </li>
+                <li>
+                    <a href="{% url "user:logout" %}">Logout</a>
+                </li>
+            </ul>            
+        </ul>
+    </nav>
+</header>
+<!-- Header Area End -->

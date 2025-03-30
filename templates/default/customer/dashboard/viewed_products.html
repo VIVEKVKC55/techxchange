@@ -1,0 +1,68 @@
+{% extends "default/layout/layout.html" %}
+{% load static %}
+
+{% block title %} User Profile {% endblock %}
+{% block canonical_url %}{{request.scheme}}://{{request.META.HTTP_HOST}}{{request.path}}{% endblock %}
+
+{% block ld_json %}
+{{home_schema|safe}}
+{% endblock %}
+{% block extrastyle %}
+<style>
+
+</style>
+{% endblock %}
+{% block home_content %}
+    <!-- hero area -->
+    {% include "default/customer/dashboard/left-menu.html" %}
+ 
+    <div class="products-catagories-area clearfix">
+        <div class="container mb-4 mt-4">
+            {% include 'default/customer/dashboard/page_header.html' with title="Products Viewed By Me" %}
+            <div class="card shadow-lg border-0 rounded-4 p-3">
+                {% if viewed_products %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Viewed At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in viewed_products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category.name }}</td>
+                                <td>
+                                    {% for view in product.user_views.all %}
+                                        {% if view.user == request.user %}
+                                            {{ view.viewed_at|date:"Y-m-d H:i:s" }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'catalog:product_detail' cat_slug=product.category.slug pk=product.id %}" class="btn btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        You have not viewed any products yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- hero area end -->
+{% endblock home_content %}
+{% block extrajs %}
+
+{% endblock extrajs %}
