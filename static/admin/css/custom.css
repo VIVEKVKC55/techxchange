@@ -1,13 +1,13 @@
 /* Change header background color */
 #header {
-    background: #dc3545 !important;
+    background: #2a8641 !important;
     /* TechXchange blue */
     color: white !important;
 }
 
 /* Optional: Change hover effects */
 #header a:hover {
-    background: #dc3545 !important;
+    background: #2a8641 !important;
 }
 
 /* Change "View Site" link color */
@@ -19,7 +19,7 @@
 .module h2,
 .module caption,
 .inline-group h2 {
-    background: #dc3545 !important;
+    background: #2a8641 !important;
     /* Bootstrap danger red */
     color: white !important;
     padding: 8px 16px !important;
@@ -30,7 +30,7 @@
 
 /* Change the "+ Add" button color to match */
 .addlink {
-    color: #dc3545 !important;
+    color: #2a8641 !important;
 }
 
 .addlink:hover {
@@ -40,7 +40,7 @@
 
 /* Change the "Change" link color */
 .changelink {
-    color: #dc3545 !important;
+    color: #2a8641 !important;
 }
 
 .changelink:hover {
@@ -49,10 +49,9 @@
 
 /* Change the breadcrumb background */
 .breadcrumbs {
-    background: #f2dede !important;
+    background: #2a8641 !important;
     /* Light red background */
     border: 1px solid #ebccd1 !important;
-    color: #a94442 !important;
 }
 
 /* Change the save button color */
