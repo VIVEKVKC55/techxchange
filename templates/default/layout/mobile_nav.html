@@ -14,16 +14,23 @@
     <div class="dropdown">
         <a class="text-dark text-decoration-none dropdown-toggle" href="#" role="button"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa fa-user"></i> My Account
+            <i class="fa fa-user fa-2x"></i>  
         </a>
         <ul class="dropdown-menu custom-dropdown">
             {% if user.is_authenticated %}
-            <li><a class="dropdown-item" href="{% url 'user:profile' %}"><i class="fa fa-user-circle me-2"></i>Profile</a></li>
-            <li><a class="dropdown-item" href="{% url 'user:logout' %}"><i class="fa fa-sign-out me-2"></i>Logout</a></li>
+                <li><a class="dropdown-item" href="{% url 'user:profile' %}"><i class="fa fa-user-circle me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item" href="{% url 'user:logout' %}"><i class="fa fa-sign-out me-2"></i>Logout</a></li>
             {% else %}
-            <li><a class="dropdown-item" href="{% url 'user:register' %}"><i class="fa fa-user-plus me-2"></i>Registration</a></li>
-            <li><a class="dropdown-item" href="{% url 'user:login' %}"><i class="fa fa-sign-in me-2"></i>Login</a></li>
+                <li><a class="dropdown-item" href="{% url 'user:register' %}"><i class="fa fa-user-plus me-2"></i>Registration</a></li>
+                <li><a class="dropdown-item" href="{% url 'user:login' %}"><i class="fa fa-sign-in me-2"></i>Login</a></li>
             {% endif %}
+             <!-- Divider -->
+            <li><hr class="dropdown-divider"></li>
+            
+            <!-- Google Translate Option -->
+            <li>
+                <div id="google_translate_element"></div>
+            </li>
         </ul>
     </div>
 </div>
