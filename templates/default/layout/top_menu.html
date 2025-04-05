@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm desktop-nav">
 	<div class="container">
 		<a href="{% url 'home:home' %}"> <!-- Update this URL name to match your home view -->
-			<img src="{% static 'img/logo/image.png' %}" class="" alt="TechXchange Logo">
+			<img src="{% static 'img/logo/image.png' %}" class="nav_logo" alt="TechXchange Logo">
 		</a>
 		<!-- Search Bar -->
 		<form action="{% url 'catalog:product_list' %}" method="GET" class="search-bar mx-3 d-flex align-items-center">

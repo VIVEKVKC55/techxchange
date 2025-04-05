@@ -800,7 +800,7 @@ progress {
     }
 }
 
-@media (min-width:768px) {
+@media (min-width:767px) {
 
     .container,
     .container-md,
@@ -4750,7 +4750,7 @@ fieldset:disabled .btn {
     }
 }
 
-@media (min-width:992px) {
+@media (min-width:767px) {
     .navbar-expand-lg {
         flex-wrap: nowrap;
         justify-content: flex-start

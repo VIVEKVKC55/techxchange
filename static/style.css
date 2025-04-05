@@ -107,7 +107,7 @@
     }
 
     /* Show only on mobile */
-    @media (min-width: 768px) {
+    @media (min-width: 767px) {
         .mobile-search {
             display: none;
         }
@@ -229,7 +229,7 @@
         color: #dc3545;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 767px) {
         .mobile-footer {
             display: none !important;
         }
@@ -327,4 +327,14 @@
 
     .goog-te-menu2-item-selected {
         background-color: #e9ecef !important;
+    }
+
+    .nav_logo {
+        width: 60%;
+        height: auto;
+    }
+
+    .mobile_nav_logo {
+        max-height: 50px;
+        height: auto;
     }
