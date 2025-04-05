@@ -29,7 +29,7 @@
 </div>
 <!-- Mobile Search Bar -->
 <div class="search-bar mobile-search m-3">
-    <form action="{% url 'catalog:product_list' %}" method="GET" class="search-bar mx-3 d-flex align-items-center">
+    <form action="{% url 'catalog:product_list' %}" method="GET" class="mobile-search-bar mx-3 d-flex align-items-center">
         <i class="fa fa-search text-muted"></i>
         <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Search product..." value="{{ query }}">
         <button type="submit" class="btn p-0">

@@ -338,3 +338,10 @@
         max-height: 50px;
         height: auto;
     }
+
+    .mobile-search-bar {
+        background: #f0f1f3;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
