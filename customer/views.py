@@ -50,10 +50,23 @@ def register(request):
             is_verified=False  # Verification status remains false initially
         )
 
+        # ✅ Send email to admin
+        subject = "New User Registration Pending Approval"
+        message = f"""A new user has registered and requires admin approval.
+                    Name: {name}
+                    Email: {email}
+                    Phone: {phone_number}
+                    Location: {location}
+                    You can activate the account in the admin panel."""
+
+        admin_email = settings.DEFAULT_FROM_EMAIL  # Or use a fixed email like 'admin@example.com'
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [admin_email])
+
         messages.success(request, "Registration successful! Admin approval is required before activation.")
         return redirect("user:login")
 
     return render(request, "default/customer/register.html")
+
 
 
 def user_login(request):
