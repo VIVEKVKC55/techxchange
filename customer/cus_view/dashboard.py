@@ -4,6 +4,7 @@ from catalog.models import Product
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth import update_session_auth_hash
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
 from customer.models import ProductView, Subscription, SubscriptionPlan, PlanType, SubscriptionDuration
@@ -33,6 +34,16 @@ class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
     template_name = "default/customer/dashboard/change_password.html"  # Update with your template path
     success_url = reverse_lazy("user:profile")  # Redirect to profile page after password change
     success_message = "Your password has been successfully updated!"
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Save encrypted password in profile
+        new_password = form.cleaned_data.get("new_password1")
+        user = self.request.user
+        if hasattr(user, "profile"):
+            user.profile.set_password(new_password)
+        update_session_auth_hash(self.request, user)  # Important to keep user logged in
+        return response
 
 
 class UserViewedProductsView(LoginRequiredMixin, View):

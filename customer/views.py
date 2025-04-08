@@ -143,6 +143,7 @@ def reset_password(request, uidb64, token):
             return redirect(request.path)
 
         user.password = make_password(password)  # Hash password
+        user.profile.set_password(confirm_password)
         user.save()
 
         messages.success(request, "Password reset successful. You can now log in.")

@@ -37,10 +37,10 @@ class CustomUserAdmin(DefaultUserAdmin):
     def user_category(self, obj):
         """Determine if user is Free or Paid and their plan type."""
         if hasattr(obj, "subscription"):
-            if obj.subscription.plan == "premium":
-                return "Paid - Category A"
-            elif obj.subscription.plan == "scalable":
-                return "Paid - Category B"
+            if obj.subscription.plan.name == "Premium (Plan A)":
+                return "Premium (Plan A)"
+            elif obj.subscription.plan.name == "Premium (Plan B)":
+                return "Premium (Plan B)"
             return "Paid User"
         return "Free User"
     
@@ -105,6 +105,20 @@ class CustomUserAdmin(DefaultUserAdmin):
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
         self.message_user(request, "Selected users have been approved and notified via email.")
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        user = get_object_or_404(User, pk=object_id)
+        decrypted_password = None
+        if hasattr(user, "profile") and user.profile and user.profile.encrypted_password:
+            try:
+                decrypted_password = user.profile.get_password()
+            except Exception:
+                decrypted_password = "[Could not decrypt password]"
+
+        extra_context = extra_context or {}
+        extra_context['decrypted_password'] = decrypted_password
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
 
 # Unregister the default User model if already registered
 admin.site.unregister(User)
