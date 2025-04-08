@@ -1,10 +1,12 @@
+import logging
 from django.db import models
 from django.contrib.auth.models import User
+from storages.backends.s3boto3 import S3Boto3Storage
 from catalog.models import Product
 from django.utils.timezone import now
 from datetime import timedelta
-from storages.backends.s3boto3 import S3Boto3Storage
-import logging
+from utils.crypto import encrypt_password, decrypt_password
+
 logger = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
@@ -15,6 +17,14 @@ class UserProfile(models.Model):
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    encrypted_password = models.TextField()
+
+    def set_password(self, raw_password):
+        self.encrypted_password = encrypt_password(raw_password)
+        self.save()
+
+    def get_password(self):
+        return decrypt_password(self.encrypted_password)
 
     def delete(self, *args, **kwargs):
         """Delete profile picture from S3 when the UserProfile is deleted"""

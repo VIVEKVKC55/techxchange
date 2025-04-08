@@ -62,13 +62,3 @@
 .default:hover {
     background: #c9302c !important;
 }
-
-/* Change the delete button color */
-.deletelink {
-    background: #d9534f !important;
-    color: white !important;
-}
-
-.deletelink:hover {
-    background: #c9302c !important;
-}

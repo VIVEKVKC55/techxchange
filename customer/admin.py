@@ -10,6 +10,8 @@ from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, Subsc
 from django.conf import settings
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.safestring import mark_safe
+import secrets
+import string
 
 User = get_user_model()
 
@@ -76,9 +78,12 @@ class CustomUserAdmin(DefaultUserAdmin):
         """Approves selected users and sends them login credentials via email"""
         for user in queryset:
             if not user.is_active:  # Approve only inactive users
-                default_password = "123456"  # Default password
+                # Generate a secure random password
+                characters = string.ascii_letters + string.digits + string.punctuation
+                default_password = ''.join(secrets.choice(characters) for _ in range(6))
                 user.set_password(default_password)  # Set default password
                 user.is_active = True
+                user.profile.set_password(default_password)  # Set password in UserProfile if needed
                 user.save()
 
                 # Send email with login details
