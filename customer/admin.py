@@ -12,6 +12,8 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.safestring import mark_safe
 import secrets
 import string
+from django.http import HttpResponse
+from docx import Document
 
 User = get_user_model()
 
@@ -32,10 +34,9 @@ class CustomUserAdmin(DefaultUserAdmin):
     )
     list_filter = ("subscription__plan", "is_active", "profile__is_verified")
     search_fields = ("email", "username", "profile__phone_number", "profile__location")
-    actions = ["approve_users"]  # Add bulk approval option
+    actions = ["approve_users", "download_filtered_user_data"]  # Add bulk actions
 
     def user_category(self, obj):
-        """Determine if user is Free or Paid and their plan type."""
         if hasattr(obj, "subscription"):
             if obj.subscription.plan.name == "Premium (Plan A)":
                 return "Premium (Plan A)"
@@ -43,50 +44,43 @@ class CustomUserAdmin(DefaultUserAdmin):
                 return "Premium (Plan B)"
             return "Paid User"
         return "Free User"
-    
+
     user_category.short_description = "User Type"
 
     def phone_number(self, obj):
-        """Retrieve phone number from UserProfile"""
         return obj.profile.phone_number if hasattr(obj, "profile") and obj.profile else "N/A"
-    
+
     phone_number.short_description = "Phone"
 
     def location(self, obj):
-        """Retrieve location from UserProfile"""
         return obj.profile.location if hasattr(obj, "profile") and obj.profile else "N/A"
-    
+
     location.short_description = "Location"
 
     def is_verified(self, obj):
-        """Check if profile is verified"""
         return obj.profile.is_verified if hasattr(obj, "profile") and obj.profile else False
-    
+
     is_verified.short_description = "Verified"
-    is_verified.boolean = True  # Show as a checkbox in admin
+    is_verified.boolean = True
 
     def profile_picture_preview(self, obj):
-        """Display Profile Picture in Admin Panel"""
         if hasattr(obj, "profile") and obj.profile and obj.profile.profile_picture:
             return format_html(f'<img src="{obj.profile.profile_picture.url}" width="40" height="40" style="border-radius:50%;">')
         return "No Image"
-    
+
     profile_picture_preview.short_description = "Profile Pic"
 
     @admin.action(description="Approve selected users and send login details")
     def approve_users(self, request, queryset):
-        """Approves selected users and sends them login credentials via email"""
         for user in queryset:
-            if not user.is_active:  # Approve only inactive users
-                # Generate a secure random password
+            if not user.is_active:
                 characters = string.ascii_letters + string.digits + string.punctuation
                 default_password = ''.join(secrets.choice(characters) for _ in range(6))
-                user.set_password(default_password)  # Set default password
+                user.set_password(default_password)
                 user.is_active = True
-                user.profile.set_password(default_password)  # Set password in UserProfile if needed
+                user.profile.set_password(default_password)
                 user.save()
 
-                # Send email with login details
                 subject = "Your Account is Approved!"
                 message = f"""
                 Dear {user.first_name},
@@ -105,6 +99,45 @@ class CustomUserAdmin(DefaultUserAdmin):
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
         self.message_user(request, "Selected users have been approved and notified via email.")
+
+    @admin.action(description="Download filtered user data as Excel")
+    def download_filtered_user_data(self, request, queryset):
+        import openpyxl
+        from openpyxl.utils import get_column_letter
+
+        changelist = self.get_changelist_instance(request)
+        filtered_queryset = changelist.get_queryset(request)
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = 'Filtered Users'
+
+        headers = [
+            "Full Name", "Username", "Email", "User Plan Category", "Phone", "Location",
+            "Verified", "Active", "Date Joined"
+        ]
+        for col_num, header in enumerate(headers, 1):
+            col_letter = get_column_letter(col_num)
+            sheet[f"{col_letter}1"] = header
+
+        for row_num, user in enumerate(filtered_queryset, 2):
+            profile = getattr(user, 'profile', None)
+            sheet[f"A{row_num}"] = user.get_full_name() or 'N/A'
+            sheet[f"B{row_num}"] = user.username
+            sheet[f"C{row_num}"] = user.email
+            sheet[f"D{row_num}"] = self.user_category(user)
+            sheet[f"E{row_num}"] = getattr(profile, 'phone_number', 'N/A')
+            sheet[f"F{row_num}"] = getattr(profile, 'location', 'N/A')
+            sheet[f"G{row_num}"] = "Yes" if getattr(profile, 'is_verified', False) else "No"
+            sheet[f"H{row_num}"] = "Yes" if user.is_active else "No"
+            sheet[f"I{row_num}"] = user.date_joined.strftime('%Y-%m-%d %H:%M')
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        response['Content-Disposition'] = 'attachment; filename=filtered_user_data.xlsx'
+        workbook.save(response)
+        return response
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         user = get_object_or_404(User, pk=object_id)
