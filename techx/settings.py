@@ -15,9 +15,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 import pymysql
 pymysql.install_as_MySQLdb()
+from logging.config import dictConfig
 from .logger import LOGGING
 
-LOGGING['handlers']['file']['filename'] = "/tmp/logs/django.log"  # ✅ Use writable location
+dictConfig(LOGGING)
+
 # Load environment variables
 load_dotenv()
 

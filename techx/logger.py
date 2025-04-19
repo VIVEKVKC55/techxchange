@@ -1,31 +1,65 @@
 import os
+from pathlib import Path
 
-# Define log directory
-LOG_DIR = "/tmp/logs"  # ✅ Use /tmp since Vercel allows writing here
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Ensure the directory exists
-if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR, exist_ok=True)
+LOG_DIR = os.path.join(BASE_DIR, "logging")
+os.makedirs(LOG_DIR, exist_ok=True)
 
-# Define logging settings
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
     "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(message)s"
+        "standard": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            "datefmt": "%Y/%m/%d %H:%M:%S",
         },
     },
     "handlers": {
-        "file": {
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": [
+                "require_debug_false",
+            ],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+        "console": {
             "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": os.path.join(LOG_DIR, "django.log"),  # ✅ Use writable location
-            "formatter": "verbose",
+            "class": "logging.StreamHandler",
+        },
+        "default": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "techx.log"),
+            "formatter": "standard",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 10,
+            "delay": True,
+        },
+        "request_handler": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "request.log"),
+            "formatter": "standard",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 10,  # Keep 10 backup files
+            "delay": True,
         },
     },
-    "root": {
-        "handlers": ["file"],
-        "level": "DEBUG",
+    "loggers": {
+        "": {
+            "handlers": ["default", "mail_admins"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["request_handler"],
+            "level": "ERROR",
+            "propagate": False,
+        },
     },
 }
