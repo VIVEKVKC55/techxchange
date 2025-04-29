@@ -371,6 +371,12 @@ from .models import PaymentRecord
 from django.contrib.auth.models import User
 from io import BytesIO
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import LETTER
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from io import BytesIO
+from django.core.mail import EmailMessage
+from django.conf import settings
 import datetime
 
 class PaymentRecordAdmin(admin.ModelAdmin):
@@ -398,19 +404,86 @@ class PaymentRecordAdmin(admin.ModelAdmin):
             sub_amount = request.POST.get('sub_amount')
             paid_amount = request.POST.get('paid_amount')
             remaining_amount = request.POST.get('sub_remaining_amount')
-            method = request.POST.get('payment_method')
+            payment_method = request.POST.get('payment_method')
 
             # Create PDF
             buffer = BytesIO()
-            p = canvas.Canvas(buffer)
-            p.drawString(100, 800, f"Invoice for {payment.user.username}")
-            p.drawString(100, 780, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d')}")
-            p.drawString(100, 760, f"Subscription Amount: ${sub_amount}")
-            p.drawString(100, 740, f"Paid Amount: ${paid_amount}")
-            p.drawString(100, 720, f"Remaining Amount: ${remaining_amount}")
-            p.drawString(100, 700, f"Payment Method: {method}")
+            p = canvas.Canvas(buffer, pagesize=LETTER)
+            width, height = LETTER
+
+            # Draw outer border
+            p.setLineWidth(1)
+            p.roundRect(50, 500, 500, 220, 10)
+
+            # Header
+            p.setFillColor(colors.darkblue)
+            p.setStrokeColor(colors.black)
+            p.rect(50, 700, 500, 20, fill=1)
+            p.setFillColor(colors.white)
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(55, 705, "CASH RECEIPTS")
+
+            p.setFillColor(colors.black)
+            p.setFont("Helvetica", 10)
+
+            # Received From, Date
+            p.drawString(60, 675, "RECEIVED FROM:")
+            p.drawString(300, 675, "DATE:")
+            p.line(150, 673, 280, 673)
+            p.line(340, 673, 530, 673)
+
+            # Address
+            p.drawString(60, 655, "ADDRESS:")
+            p.line(130, 653, 530, 653)
+
+            # Dollar and For
+            p.drawString(60, 630, "DOLLAR ($):")
+            p.drawString(300, 630, "FOR:")
+            p.line(130, 628, 250, 628)
+            p.line(330, 628, 530, 628)
+
+            # Total Due, Paid, Balance
+            p.drawString(60, 600, "TOTAL DUE:")
+            p.line(130, 598, 250, 598)
+            p.drawString(60, 580, "PAID AMOUNT:")
+            p.line(130, 578, 250, 578)
+            p.drawString(60, 560, "DUE BALANCE:")
+            p.line(130, 558, 250, 558)
+
+            # Payment methods
+            p.drawString(300, 600, "CHECK:")
+            p.line(360, 598, 530, 598)
+            p.drawString(300, 580, "CASH:")
+            p.line(360, 578, 530, 578)
+            p.drawString(300, 560, "MONEY ORDER:")
+            p.line(390, 558, 530, 558)
+
+            # BY
+            p.drawString(60, 530, "BY:")
+            p.line(90, 528, 530, 528)
+
+            # Fill in values
+            today = datetime.datetime.now().strftime('%Y-%m-%d')
+            p.drawString(340, 675, today)
+            p.drawString(130, 628, f"${sub_amount}")
+            p.drawString(330, 628, "Subscription Fee")
+            p.drawString(130, 598, f"${sub_amount}")
+            p.drawString(130, 578, f"${paid_amount}")
+            p.drawString(130, 558, f"${remaining_amount}")
+            p.drawString(360, 578, payment_method)
+
             p.showPage()
             p.save()
+            buffer.seek(0)
+
+            email = EmailMessage(
+                'Your Invoice',
+                'Attached is your invoice.',
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+            )
+            email.attach('invoice.pdf', buffer.read(), 'application/pdf')
+            email.send()
 
             buffer.seek(0)
             email = EmailMessage(
