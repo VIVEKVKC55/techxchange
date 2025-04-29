@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Invoice</title>
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+</head>
+<body>
+    <h2>Send Invoice to {{ payment.user.username }}</h2>
+    <form id="invoiceForm" method="POST">
+        {% csrf_token %}
+        <label>Email:</label><br>
+        <input type="email" name="email" value="{{ payment.user.email }}"><br><br>
+
+        <label>Subscription Amount:</label><br>
+        <input type="text" name="sub_amount" value="{{ payment.sub_amount }}"><br><br>
+
+        <label>Paid Amount:</label><br>
+        <input type="text" name="paid_amount" value="{{ payment.paid_amount }}"><br><br>
+
+        <label>Remaining Amount:</label><br>
+        <input type="text" name="sub_remaining_amount" value="{{ payment.sub_remaining_amount }}"><br><br>
+
+        <label>Payment Method:</label><br>
+        <input type="text" name="payment_method" value="{{ payment.payment_method }}"><br><br>
+
+        <button type="submit">Send Email</button>
+    </form>
+
+    <script>
+        document.getElementById('invoiceForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+
+            const response = await fetch("", {
+                method: "POST",
+                body: data
+            });
+
+            if (response.ok) {
+                alert("Invoice sent successfully!");
+                window.close();
+            } else {
+                alert("Error sending invoice.");
+            }
+        }
+    </script>
+</body>
+</html>

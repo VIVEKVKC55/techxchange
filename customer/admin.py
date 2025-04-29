@@ -6,14 +6,20 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.utils.html import format_html
 from django.urls import path, reverse
-from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, SubscriptionDuration
+from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, SubscriptionDuration, PaymentRecord
 from django.conf import settings
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.safestring import mark_safe
 import secrets
 import string
 from django.http import HttpResponse
-from docx import Document
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+from django.core.mail import EmailMessage
+import logging
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -177,7 +183,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def approve_subscription(self, request, subscription_id):
         subscription = get_object_or_404(Subscription, id=subscription_id)
 
-        if subscription.amount_paid <= 0:  # ✅ Check if payment is collected
+        if subscription.amount_paid <= 0:
             messages.error(request, "Cannot approve. Payment not received yet.")
             return redirect('/admin/customer/subscription/')
 
@@ -188,31 +194,96 @@ class SubscriptionAdmin(admin.ModelAdmin):
             try:
                 subscription_plan = SubscriptionPlan.objects.get(plan_type=plan_type, duration_days=duration)
             except SubscriptionPlan.DoesNotExist:
-                messages.error(request, "The selected plan-duration combination is invalid.")
+                messages.error(request, "Invalid plan-duration combination.")
                 return redirect('/admin/customer/subscription/')
 
-            subscription.plan = plan_type
-            subscription.duration_days = duration
-            subscription.start_date = now()
-            subscription.end_date = now() + timedelta(days=duration.duration_days)
-            subscription.is_approved = True
-            
-            # Clear pending request fields
-            subscription.pending_plan = None
-            subscription.pending_duration = None
-            subscription.save()
+            try:
+                # Update subscription
+                subscription.plan = plan_type
+                subscription.duration_days = duration
+                subscription.start_date = now()
+                subscription.end_date = now() + timedelta(days=duration.duration_days)
+                subscription.is_approved = True
+                subscription.pending_plan = None
+                subscription.pending_duration = None
+                subscription.save()
 
-            send_mail(
-                "Subscription Approved",
-                f"Dear {subscription.user.username},\n\n"
-                f"Your subscription has been upgraded to {plan_type.name} for {duration.duration_days} days at ${subscription_plan.price}.\n\n"
-                "Best Regards,\nSupport Team",
-                "support@example.com",
-                [subscription.user.email],
-                fail_silently=True,
-            )
+                PaymentRecord.objects.create(
+                    user=subscription.user,
+                    subscription=subscription,
+                    sub_amount=subscription.amount_paid,
+                    payment_method="Cash",
+                    paid_amount=subscription.amount_paid,
+                    sub_remaining_amount=0,  # Assuming full payment
+                    payment_date=now(),
+                )
 
-            messages.success(request, f"Subscription for {subscription.user.username} approved successfully!")
+                # Generate styled PDF invoice
+                buffer = BytesIO()
+                p = canvas.Canvas(buffer, pagesize=letter)
+                width, height = letter
+
+                p.roundRect(0.5*inch, height - 4*inch, 7.5*inch, 3.5*inch, 10, stroke=1, fill=0)
+
+                # Header
+                p.setFont("Helvetica-Bold", 14)
+                p.setFillColorRGB(0, 0.2, 0.6)
+                p.rect(0.5*inch, height - 0.7*inch, 7.5*inch, 0.4*inch, fill=1)
+                p.setFillColorRGB(1, 1, 1)
+                p.drawString(0.6*inch, height - 0.55*inch, "CASH RECEIPT")
+
+                # Content
+                p.setFillColorRGB(0, 0, 0)
+                p.setFont("Helvetica", 11)
+                line_start = height - 1.1*inch
+                line_gap = 0.3*inch
+
+                p.drawString(0.6*inch, line_start, f"RECEIVED FROM: {subscription.user.username}")
+                p.drawString(4.5*inch, line_start, f"DATE: {subscription.start_date.strftime('%Y-%m-%d')}")
+
+                p.drawString(0.6*inch, line_start - line_gap, f"ADDRESS: {subscription.user.profile.location}")
+                p.drawString(0.6*inch, line_start - 2*line_gap, f"DOLLAR (AED): {subscription.amount_paid:.2f}       FOR: {subscription.plan.name}")
+
+                # Summary Table
+                table_top = line_start - 3.5*line_gap
+                p.drawString(0.6*inch, table_top, f"TOTAL DUE: AED {subscription.amount_paid:.2f}")
+                p.drawString(0.6*inch, table_top - line_gap, f"PAID AMOUNT: AED {subscription.amount_paid:.2f}")
+                p.drawString(0.6*inch, table_top - 2*line_gap, "DUE BALANCE: AED 0.00")
+
+                p.drawString(3.5*inch, table_top, "CHECK")
+                p.drawString(3.5*inch, table_top - line_gap, "CASH ✓")
+                p.drawString(3.5*inch, table_top - 2*line_gap, "MONEY ORDER")
+
+                p.drawString(0.6*inch, table_top - 3*line_gap, f"BY: Admin")
+
+                p.showPage()
+                p.save()
+
+                buffer.seek(0)
+                pdf_file = buffer.getvalue()
+                buffer.close()
+
+                # Send email with PDF
+                email = EmailMessage(
+                    "Subscription Approved",
+                    f"Dear {subscription.user.username},\n\n"
+                    f"Your subscription has been approved.\n\n"
+                    f"Plan: {plan_type.name}\n"
+                    f"Duration: {duration.duration_days} days\n"
+                    f"Amount Paid: AED {subscription.amount_paid:.2f}\n\n"
+                    "Please find the invoice attached.\n\nBest Regards,\nSupport Team",
+                    "support@example.com",
+                    [subscription.user.email]
+                )
+                email.attach("Invoice.pdf", pdf_file, "application/pdf")
+                email.send(fail_silently=True)
+
+                messages.success(request, f"Subscription for {subscription.user.username} approved and invoice emailed.")
+
+            except Exception as e:
+                logger.error(f"Error processing subscription approval: {e}")
+                messages.error(request, "Error processing subscription approval. Please try again.")
+
         return redirect('/admin/customer/subscription/')
 
     def reject_subscription(self, request, subscription_id):
@@ -285,3 +356,74 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
     list_filter = ("plan_type", "duration_days")
     search_fields = ("plan_type__name",)
     ordering = ("plan_type", "duration_days")
+
+from django.contrib import admin
+from django.urls import path
+from django.template.response import TemplateResponse
+from django.utils.html import format_html
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+from .models import PaymentRecord
+from django.contrib.auth.models import User
+from io import BytesIO
+from reportlab.pdfgen import canvas
+import datetime
+
+class PaymentRecordAdmin(admin.ModelAdmin):
+    list_display = ('user', 'subscription', 'paid_amount', 'payment_date', 'send_invoice_button')
+    search_fields = ['user__username']
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('send-invoice/<int:pk>/', self.admin_site.admin_view(self.send_invoice_view), name='send-invoice'),
+        ]
+        return custom_urls + urls
+
+    def send_invoice_button(self, obj):
+        return format_html(
+            '<button class="button" onclick="openInvoicePopup({})">Send Invoice</button>', obj.id
+        )
+    send_invoice_button.short_description = 'Send Invoice'
+
+    def send_invoice_view(self, request, pk):
+        payment = get_object_or_404(PaymentRecord, pk=pk)
+
+        if request.method == "POST":
+            user_email = request.POST.get('email')
+            sub_amount = request.POST.get('sub_amount')
+            paid_amount = request.POST.get('paid_amount')
+            remaining_amount = request.POST.get('sub_remaining_amount')
+            method = request.POST.get('payment_method')
+
+            # Create PDF
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer)
+            p.drawString(100, 800, f"Invoice for {payment.user.username}")
+            p.drawString(100, 780, f"Date: {datetime.datetime.now().strftime('%Y-%m-%d')}")
+            p.drawString(100, 760, f"Subscription Amount: ${sub_amount}")
+            p.drawString(100, 740, f"Paid Amount: ${paid_amount}")
+            p.drawString(100, 720, f"Remaining Amount: ${remaining_amount}")
+            p.drawString(100, 700, f"Payment Method: {method}")
+            p.showPage()
+            p.save()
+
+            buffer.seek(0)
+            email = EmailMessage(
+                'Your Subscription Invoice',
+                'Please find attached your invoice.',
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+            )
+            email.attach('invoice.pdf', buffer.read(), 'application/pdf')
+            email.send()
+
+            return JsonResponse({'status': 'success'})
+
+        return TemplateResponse(request, 'admin/send_invoice_popup.html', {'payment': payment})
+
+admin.site.register(PaymentRecord, PaymentRecordAdmin)

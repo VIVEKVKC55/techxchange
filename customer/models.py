@@ -39,6 +39,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
+
 class PlanType(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True)  # e.g., 'Premium A', 'Premium B'
@@ -107,6 +108,18 @@ class Subscription(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.plan.name if self.plan else 'Basic'} ({self.duration_days.duration_days if self.duration_days else 'Free'})"
 
+
+class PaymentRecord(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, related_name="payments")
+    sub_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    sub_remaining_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.user.username} - ${self.paid_amount} on {self.payment_date}"
 
 
 class ProductView(models.Model):

@@ -1,5 +1,6 @@
 from django import forms
-from .models import Subscription, PlanType, SubscriptionDuration, SubscriptionPlan
+from .models import Subscription, PlanType, SubscriptionDuration, SubscriptionPlan, PaymentRecord
+
 
 class SubscriptionUpgradeForm(forms.ModelForm):
     plan = forms.ModelChoiceField(queryset=PlanType.objects.all(), required=True, label="Plan Type")
@@ -22,3 +23,9 @@ class SubscriptionUpgradeForm(forms.ModelForm):
             raise forms.ValidationError("Invalid plan and duration combination.")
 
         return cleaned_data
+
+
+class PaymentRecordEmailForm(forms.ModelForm):
+    class Meta:
+        model = PaymentRecord
+        fields = '__all__'

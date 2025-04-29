@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice</title>
+    <style>
+        body { font-family: Arial; }
+        .invoice-box { max-width: 800px; padding: 30px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <h1>Invoice</h1>
+        <p><strong>User:</strong> {{ record.user.username }}</p>
+        <p><strong>Subscription:</strong> {{ record.subscription }}</p>
+        <p><strong>Paid Amount:</strong> ${{ record.paid_amount }}</p>
+        <p><strong>Remaining Amount:</strong> ${{ record.sub_remaining_amount }}</p>
+        <p><strong>Payment Date:</strong> {{ record.payment_date }}</p>
+        <p><strong>Payment Method:</strong> {{ record.payment_method }}</p>
+    </div>
+</body>
+</html>

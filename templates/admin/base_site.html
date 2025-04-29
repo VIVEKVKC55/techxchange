@@ -18,4 +18,10 @@
 
 {% block extrastyle %}
 <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+<script>
+    function openInvoicePopup(id) {
+        const url = `/admin/customer/paymentrecord/send-invoice/${id}/`;
+        const popup = window.open(url, "Send Invoice", "width=600,height=600");
+    }
+</script>
 {% endblock %}
