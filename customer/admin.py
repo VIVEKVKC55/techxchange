@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-admin.site.index_title = "TechXchange Dashboard"      # Dashboard subtitle
+admin.site.index_title = "Techexchange Dashboard"      # Dashboard subtitle
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -166,9 +166,9 @@ admin.site.register(User, CustomUserAdmin)
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = (
-        "user", "approve_button", "amount_paid", "plan", "duration_days", "is_approved", 
-        "pending_plan", "pending_duration", "start_date", "end_date", 
-        "reject_button"
+        "user", "approve_button", "amount_paid", "plan", "duration_days", "is_approved",
+        "remaining_days_display", "pending_plan", "pending_duration", "start_date",
+        "end_date", "reject_button"
     )
     list_filter = ("plan", "is_approved")
 
@@ -323,6 +323,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
             )
         return "No pending request"
 
+    def remaining_days_display(self, obj):
+        return obj.remaining_days()
+
+    remaining_days_display.short_description = "Remaining Days"
     approve_button.short_description = "Approve"
     reject_button.short_description = "Reject"
 
@@ -330,8 +334,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         js = ("admin/js/sweetalert2.min.js", "admin/js/subscription_actions.js")  # ✅ Load JavaScript for SweetAlert
 
 admin.site.register(Subscription, SubscriptionAdmin)
-
-
 
 
 @admin.register(PlanType)
