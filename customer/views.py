@@ -28,7 +28,7 @@ def register(request):
 
         if Customer.objects.filter(email=email).exists():
             messages.error(request, "Email already in use!")
-            return redirect("register")
+            return redirect("user:register")
 
         # Split full name into first and last name
         name_parts = name.strip().split(" ", 1)  # Split at first space

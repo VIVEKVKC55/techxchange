@@ -29,7 +29,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
             max_limit += user.subscription.extra_slots  
 
             return max_limit  # Final dynamic limit
-        return 1  # Default limit for free users
+        return 1000  # Default limit for free users
 
     def form_valid(self, form):
         # print('form', form.data)

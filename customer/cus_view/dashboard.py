@@ -31,19 +31,28 @@ class UserProductListView(LoginRequiredMixin, ListView):
         return Product.objects.filter(created_by=self.request.user)
 
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
-    template_name = "default/customer/dashboard/change_password.html"  # Update with your template path
-    success_url = reverse_lazy("user:profile")  # Redirect to profile page after password change
+    template_name = "default/customer/dashboard/change_password.html"  
+    success_url = reverse_lazy("user:profile")  
     success_message = "Your password has been successfully updated!"
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        # Save encrypted password in profile
         new_password = form.cleaned_data.get("new_password1")
         user = self.request.user
+
+        # Example: Save encrypted password in profile (if needed)
         if hasattr(user, "profile"):
             user.profile.set_password(new_password)
-        update_session_auth_hash(self.request, user)  # Important to keep user logged in
+
+        update_session_auth_hash(self.request, user)  # keep user logged in
         return response
+
+    def form_invalid(self, form):
+        """Show error messages if validation fails"""
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field}: {error}")
+        return super().form_invalid(form)
 
 
 class UserViewedProductsView(LoginRequiredMixin, View):
