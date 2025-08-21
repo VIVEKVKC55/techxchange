@@ -50,6 +50,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         # Save product with logged-in user
         product = form.save(commit=False)
         product.created_by = user
+        product.is_active = False
         product.save()
         
         # Handling multiple images

@@ -25,6 +25,20 @@ class ProductImageInline(admin.TabularInline):  # Show images inline
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("name", "brand", "category", "is_active", "created_at", "created_by")
     search_fields = ("name", "brand", "category__name")
-    list_filter = ("category", "is_active", "created_at")
+    list_filter = ("category", "brand", "is_active", "created_at")
     ordering = ("-created_at",)
-    inlines = [ProductImageInline]  # Show images inside Product Admin
+    inlines = [ProductImageInline]
+
+    actions = ["activate_products", "deactivate_products"]
+
+    def activate_products(self, request, queryset):
+        """Mark selected products as active"""
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f"{updated} product(s) successfully activated.")
+    activate_products.short_description = "Approve selected products"
+
+    def deactivate_products(self, request, queryset):
+        """Mark selected products as inactive"""
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} product(s) successfully deactivated.")
+    deactivate_products.short_description = "Unapprove selected products"
