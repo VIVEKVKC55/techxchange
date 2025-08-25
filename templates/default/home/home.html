@@ -50,7 +50,11 @@
             {% for catagory in categories %}
             <div class="single-products-catagory category-card clearfix">
                 <a href="{% url 'catalog:product_list' %}?category={{ catagory.slug }}">
-                    <img src="{{catagory.image.url}}" alt="{{ catagory.name }}">
+                    {% if catagory.image %}
+                        <img src="{{catagory.image.url}}" alt="{{ catagory.name }}">
+                    {% else %}
+                        <img src="{% static '/img/no-image.jpg' %}" alt="{{ catagory.name }}">
+                    {% endif %}
                     <!-- Hover Content -->
                     <div class="hover-content">
                         <h4>{{ catagory.name }}</h4>
