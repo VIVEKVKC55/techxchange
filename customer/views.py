@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -12,7 +11,7 @@ from django.utils.encoding import force_bytes
 from django.urls import reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.hashers import make_password
-from .models import UserProfile
+from .models import UserProfile, BusinessProfile
 from django.http import JsonResponse
 import logging
 logger = logging.getLogger(__name__)
@@ -21,10 +20,14 @@ Customer = get_user_model()
 
 def register(request):
     if request.method == "POST":
-        name = request.POST["name"]  # Get full name from form
+        name = request.POST["name"] 
         email = request.POST["email"]
-        phone_number = request.POST.get("phone_number", "")  # Get phone number from form
-        location = request.POST.get("location", "")  # Get location from form
+        phone_number = request.POST.get("phone_number", "")
+        address = request.POST.get("address", "")
+        business_location = request.POST.get("business_location", "")
+        business_name = request.POST.get("business_name", "")
+        business_type = request.POST.get("business_type", "")
+        dealing_with = request.POST.get("dealing_with", "")
 
         if Customer.objects.filter(email=email).exists():
             messages.error(request, "Email already in use!")
@@ -46,8 +49,16 @@ def register(request):
         UserProfile.objects.create(
             user=user,
             phone_number=phone_number,
-            location=location,
+            address=address,
             is_verified=False  # Verification status remains false initially
+        )
+
+        BusinessProfile.objects.create(
+            user=user,
+            business_name=business_name,
+            business_type=business_type,
+            dealing_with=dealing_with,
+            business_location=business_location
         )
 
         # ✅ Send email to admin
@@ -56,7 +67,7 @@ def register(request):
                     Name: {name}
                     Email: {email}
                     Phone: {phone_number}
-                    Location: {location}
+                    Address: {address}
                     You can activate the account in the admin panel."""
 
         admin_email = settings.DEFAULT_FROM_EMAIL  # Or use a fixed email like 'admin@example.com'

@@ -1389,6 +1389,7 @@ img {
 }
 
 .single-products-catagory .hover-content h4 {
+  color: #dc3545;
   margin-bottom: 0;
   -webkit-transition-duration: 250ms;
   transition-duration: 250ms;

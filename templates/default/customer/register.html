@@ -28,32 +28,73 @@
         <form method="post" class="mt-4">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
+                <label for="email" class="form-label">Email ID</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="fa fa-user"></i></span>
-                    <input type="text" class="form-control" name="name" required placeholder="Full Name">
+                    <span class="input-group-text bg-white"><i class="fa fa-envelope"></i></span>
+                    <input type="email" class="form-control" name="email" required placeholder="Email ID">
                 </div>
             </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Business Name</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-envelope"></i></span>
+                    <input type="text" class="form-control" name="business_name" required placeholder="Business Name">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
+                    <input type="text" name="address" class="form-control" placeholder="Address">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Owner's Name</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-user"></i></span>
+                    <input type="text" class="form-control" name="name" required placeholder="Owner's Name">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Business Location</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
+                    <input type="text" name="business_location" class="form-control" placeholder="Business Location">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type of Business</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-briefcase"></i></span>
+                    <select name="business_type" class="form-control">
+                        <option value="">Select Type of Business</option>
+                        <option value="importer">Importer</option>
+                        <option value="exporter">Exporter</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dealing With</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fa fa-briefcase"></i></span>
+                    <select name="dealing_with" class="form-control">
+                        <option value="">Select Type of Deal</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="spare_parts">Spare Parts</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+            </div>
+
 
             <div class="mb-3">
                 <label class="form-label">Mobile Number</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
                     <input type="text" name="phone_number" class="form-control" placeholder="Mobile Number">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Location</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="fa fa-phone"></i></span>
-                    <input type="text" name="location" class="form-control" placeholder="Location">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email ID</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="fa fa-envelope"></i></span>
-                    <input type="email" class="form-control" name="email" required placeholder="Email ID">
                 </div>
             </div>
 

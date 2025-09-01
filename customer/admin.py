@@ -35,11 +35,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 class CustomUserAdmin(DefaultUserAdmin):
     list_display = (
         "email", "username", "user_category", "phone_number",
-        "location", "profile_picture_preview", "is_verified",
+        "address", "profile_picture_preview", "is_verified",
         "date_joined", "is_active"
     )
     list_filter = ("subscription__plan", "is_active", "profile__is_verified")
-    search_fields = ("email", "username", "profile__phone_number", "profile__location")
+    search_fields = ("email", "username", "profile__phone_number")
     actions = ["approve_users", "download_filtered_user_data"]  # Add bulk actions
 
     def user_category(self, obj):
@@ -58,10 +58,10 @@ class CustomUserAdmin(DefaultUserAdmin):
 
     phone_number.short_description = "Phone"
 
-    def location(self, obj):
-        return obj.profile.location if hasattr(obj, "profile") and obj.profile else "N/A"
+    def address(self, obj):
+        return obj.profile.address if hasattr(obj, "profile") and obj.profile else "N/A"
 
-    location.short_description = "Location"
+    address.short_description = "Address"
 
     def is_verified(self, obj):
         return obj.profile.is_verified if hasattr(obj, "profile") and obj.profile else False
@@ -119,7 +119,7 @@ class CustomUserAdmin(DefaultUserAdmin):
         sheet.title = 'Filtered Users'
 
         headers = [
-            "Full Name", "Username", "Email", "User Plan Category", "Phone", "Location",
+            "Full Name", "Username", "Email", "User Plan Category", "Phone", "Address",
             "Verified", "Active", "Date Joined"
         ]
         for col_num, header in enumerate(headers, 1):
@@ -133,7 +133,7 @@ class CustomUserAdmin(DefaultUserAdmin):
             sheet[f"C{row_num}"] = user.email
             sheet[f"D{row_num}"] = self.user_category(user)
             sheet[f"E{row_num}"] = getattr(profile, 'phone_number', 'N/A')
-            sheet[f"F{row_num}"] = getattr(profile, 'location', 'N/A')
+            sheet[f"F{row_num}"] = getattr(profile, 'address', 'N/A')
             sheet[f"G{row_num}"] = "Yes" if getattr(profile, 'is_verified', False) else "No"
             sheet[f"H{row_num}"] = "Yes" if user.is_active else "No"
             sheet[f"I{row_num}"] = user.date_joined.strftime('%Y-%m-%d %H:%M')
@@ -241,7 +241,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 p.drawString(0.6*inch, line_start, f"RECEIVED FROM: {subscription.user.username}")
                 p.drawString(4.5*inch, line_start, f"DATE: {subscription.start_date.strftime('%Y-%m-%d')}")
 
-                p.drawString(0.6*inch, line_start - line_gap, f"ADDRESS: {subscription.user.profile.location}")
+                p.drawString(0.6*inch, line_start - line_gap, f"ADDRESS: {subscription.user.profile.address}")
                 p.drawString(0.6*inch, line_start - 2*line_gap, f"DOLLAR (AED): {subscription.amount_paid:.2f}       FOR: {subscription.plan.name}")
 
                 # Summary Table

@@ -13,7 +13,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     profile_picture = models.ImageField(upload_to="profile_pictures/", storage=S3Boto3Storage(), blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    location = models.TextField(blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,7 +38,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
-    
+
+class BusinessProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="business_profile")
+    business_name = models.CharField(max_length=100)
+    business_type = models.CharField(max_length=50)
+    dealing_with = models.CharField(max_length=50)
+    business_location = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.business_name
 
 class PlanType(models.Model):
     id = models.AutoField(primary_key=True)
