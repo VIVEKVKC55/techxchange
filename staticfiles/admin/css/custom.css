@@ -1,0 +1,64 @@
+/* Change header background color */
+#header {
+    background: #2a8641 !important;
+    /* Techexchange blue */
+    color: white !important;
+}
+
+/* Optional: Change hover effects */
+#header a:hover {
+    background: #2a8641 !important;
+}
+
+/* Change "View Site" link color */
+#user-tools a {
+    color: white !important;
+}
+
+/* Change module header background to red */
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: #2a8641 !important;
+    /* Bootstrap danger red */
+    color: white !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
+/* Change the "+ Add" button color to match */
+.addlink {
+    color: #2a8641 !important;
+}
+
+.addlink:hover {
+    color: #c9302c !important;
+    /* Darker red on hover */
+}
+
+/* Change the "Change" link color */
+.changelink {
+    color: #2a8641 !important;
+}
+
+.changelink:hover {
+    color: #c9302c !important;
+}
+
+/* Change the breadcrumb background */
+.breadcrumbs {
+    background: #2a8641 !important;
+    /* Light red background */
+    border: 1px solid #ebccd1 !important;
+}
+
+/* Change the save button color */
+.default {
+    background: #d9534f !important;
+}
+
+.default:hover {
+    background: #c9302c !important;
+}
