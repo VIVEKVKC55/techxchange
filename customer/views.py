@@ -12,6 +12,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.hashers import make_password
 from .models import UserProfile, BusinessProfile
+from catalog.models import Category
+from .forms import RegistrationForm
 from django.http import JsonResponse
 import logging
 logger = logging.getLogger(__name__)
@@ -20,64 +22,60 @@ Customer = get_user_model()
 
 def register(request):
     if request.method == "POST":
-        name = request.POST["name"] 
-        email = request.POST["email"]
-        phone_number = request.POST.get("phone_number", "")
-        address = request.POST.get("address", "")
-        business_location = request.POST.get("business_location", "")
-        business_name = request.POST.get("business_name", "")
-        business_type = request.POST.get("business_type", "")
-        dealing_with = request.POST.get("dealing_with", "")
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            phone_number = form.cleaned_data["phone_number"]
+            address = form.cleaned_data["address"]
+            business_name = form.cleaned_data["business_name"]
+            business_location = form.cleaned_data["business_location"]
+            business_type = form.cleaned_data["business_type"]
+            dealing_with = form.cleaned_data["dealing_with"]
 
-        if Customer.objects.filter(email=email).exists():
-            messages.error(request, "Email already in use!")
-            return redirect("user:register")
+            if Customer.objects.filter(email=email).exists():
+                messages.error(request, "Email already in use!")
+                return redirect("user:register")
 
-        # Split full name into first and last name
-        name_parts = name.strip().split(" ", 1)  # Split at first space
-        first_name = name_parts[0]
-        last_name = name_parts[1] if len(name_parts) > 1 else ""  # Handle cases where there's only a first name
+            # Split name
+            name_parts = name.strip().split(" ", 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ""
 
-        # Create user with is_active=False (User needs admin approval)
-        user = Customer.objects.create_user(username=email, email=email, password="")  # No password initially
-        user.first_name = first_name
-        user.last_name = last_name
-        user.is_active = False  # User is inactive until admin approval
-        user.save()
+            user = Customer.objects.create_user(username=email, email=email, password="")
+            user.first_name = first_name
+            user.last_name = last_name
+            user.is_active = False
+            user.save()
 
-        # Create associated UserProfile
-        UserProfile.objects.create(
-            user=user,
-            phone_number=phone_number,
-            address=address,
-            is_verified=False  # Verification status remains false initially
-        )
+            UserProfile.objects.create(
+                user=user,
+                phone_number=phone_number,
+                address=address,
+                is_verified=False
+            )
 
-        BusinessProfile.objects.create(
-            user=user,
-            business_name=business_name,
-            business_type=business_type,
-            dealing_with=dealing_with,
-            business_location=business_location
-        )
+            business = BusinessProfile.objects.create(
+                user=user,
+                business_name=business_name,
+                business_type=business_type,
+                business_location=business_location
+            )
+            business.dealing_with.set(dealing_with)  # Save selected categories
+            business.save()
 
-        # ✅ Send email to admin
-        subject = "New User Registration Pending Approval"
-        message = f"""A new user has registered and requires admin approval.
-                    Name: {name}
-                    Email: {email}
-                    Phone: {phone_number}
-                    Address: {address}
-                    You can activate the account in the admin panel."""
+            # Email to admin
+            subject = "New User Registration Pending Approval"
+            message = f"A new user has registered:\nName: {name}\nEmail: {email}\nPhone: {phone_number}\nAddress: {address}"
+            admin_email = settings.DEFAULT_FROM_EMAIL
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [admin_email])
 
-        admin_email = settings.DEFAULT_FROM_EMAIL  # Or use a fixed email like 'admin@example.com'
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [admin_email])
+            messages.success(request, "Registration successful! Admin approval is required.")
+            return redirect("user:login")
+    else:
+        form = RegistrationForm()
 
-        messages.success(request, "Registration successful! Admin approval is required before activation.")
-        return redirect("user:login")
-
-    return render(request, "default/customer/register.html")
-
+    return render(request, "default/customer/register.html", {"form": form})
 
 
 def user_login(request):

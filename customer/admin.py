@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.utils.html import format_html
 from django.urls import path, reverse
-from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, SubscriptionDuration, PaymentRecord
+from .models import Subscription, UserProfile, SubscriptionPlan, PlanType, SubscriptionDuration, PaymentRecord, BusinessProfile
 from django.conf import settings
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.utils.safestring import mark_safe
@@ -359,26 +359,12 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
     search_fields = ("plan_type__name",)
     ordering = ("plan_type", "duration_days")
 
-from django.contrib import admin
-from django.urls import path
-from django.template.response import TemplateResponse
-from django.utils.html import format_html
-from django.core.mail import EmailMessage
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 
+from django.template.response import TemplateResponse
+from django.http import JsonResponse
 from .models import PaymentRecord
 from django.contrib.auth.models import User
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import LETTER
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from io import BytesIO
-from django.core.mail import EmailMessage
-from django.conf import settings
 import datetime
 
 class PaymentRecordAdmin(admin.ModelAdmin):
@@ -502,3 +488,20 @@ class PaymentRecordAdmin(admin.ModelAdmin):
         return TemplateResponse(request, 'admin/send_invoice_popup.html', {'payment': payment})
 
 admin.site.register(PaymentRecord, PaymentRecordAdmin)
+
+class BusinessProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'business_name', 'business_location', 'business_type', 'dealing_with_list')
+    
+    # Custom method to display ManyToManyField
+    def dealing_with_list(self, obj):
+        return ", ".join([c.name for c in obj.dealing_with.all()])
+    
+    dealing_with_list.short_description = 'Dealing With'
+
+    # For search_fields, remove ManyToMany field
+    search_fields = ('business_name', 'business_location', 'business_type', 'user__email')
+    
+    # For list_filter, use a related field with ManyToManyField
+    list_filter = ('business_type', 'dealing_with__name')
+
+admin.site.register(BusinessProfile, BusinessProfileAdmin)

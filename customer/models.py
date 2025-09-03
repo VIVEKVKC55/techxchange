@@ -2,7 +2,7 @@ import logging
 from django.db import models
 from django.contrib.auth.models import User
 from storages.backends.s3boto3 import S3Boto3Storage
-from catalog.models import Product
+from catalog.models import Product, Category
 from django.utils.timezone import now
 from datetime import timedelta
 from utils.crypto import encrypt_password, decrypt_password
@@ -43,7 +43,7 @@ class BusinessProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="business_profile")
     business_name = models.CharField(max_length=100)
     business_type = models.CharField(max_length=50)
-    dealing_with = models.CharField(max_length=50)
+    dealing_with = models.ManyToManyField(Category)
     business_location = models.CharField(max_length=100)
 
     def __str__(self):
